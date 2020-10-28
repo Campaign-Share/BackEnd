@@ -1,6 +1,6 @@
 package com.cs.webservice.domain.auths;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import javax.validation.constraints.*;
 @Getter
 @Entity
 @Table(name = "user_informs")
-public class UserInform {
+public class UserInform extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;
