@@ -28,4 +28,11 @@ public class UserAuth {
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "locked")
     private boolean locked;
+
+    @Builder
+    public UserAuth(String uuid, String userId, String userPW) {
+        this.uuid = uuid;
+        this.userID = userId;
+        this.userPW = userPW;
+    }
 }
