@@ -1,5 +1,6 @@
 package com.cs.webservice.domain.auths;
 
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,7 +13,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Entity
 @Table(name = "user_auths")
-public class UserAuth {
+public class UserAuth extends BaseTimeEntity {
     @Id
     @Column(unique = true, nullable = false, columnDefinition = "CHAR(17)", length = 17, name = "uuid")
     @Size(min = 17, max = 17) @NotNull @NotEmpty
