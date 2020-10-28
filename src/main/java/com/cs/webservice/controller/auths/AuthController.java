@@ -18,6 +18,15 @@ public class AuthController {
 
     @PostMapping(value = "/v1/users", consumes = {"application/json"})
     public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request dto, BindingResult bindingResult) {
-        
+        var resp = new CreateNewUser.Response();
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return resp;
+        }
+
+        System.out.println(dto);
+        resp.setStatus(HttpStatus.SC_OK);
+        return resp;
     }
 }
