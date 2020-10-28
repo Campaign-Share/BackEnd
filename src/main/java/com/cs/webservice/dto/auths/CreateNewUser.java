@@ -2,6 +2,7 @@ package com.cs.webservice.dto.auths;
 
 import com.cs.webservice.domain.auths.UserAuth;
 import com.cs.webservice.domain.auths.UserInform;
+import com.cs.webservice.dto.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -34,10 +35,6 @@ public class CreateNewUser {
         private String phoneNumber;
     }
 
-    @Setter
-    @AllArgsConstructor
     @NoArgsConstructor
-    public static class Response {
-
-    }
+    public static class Response extends BaseResponse { }
 }
