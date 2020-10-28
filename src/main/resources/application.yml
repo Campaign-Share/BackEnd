@@ -1,1 +1,11 @@
-
+server:
+  port: 8888
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_ADDRESS:localhost}:3306/CampaignShareDB?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
