@@ -1,9 +1,6 @@
 package com.cs.webservice.domain.auths;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,4 +31,10 @@ public class EmailCertify {
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "using")
     private boolean using;
+
+    @Builder
+    public EmailCertify(String email, String authCode) {
+        this.email = email;
+        this.authCode = authCode;
+    }
 }
