@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @RunWith(SpringRunner.class)
@@ -56,6 +57,8 @@ public class UserRepositoryTest {
         assertEquals(auth.getUuid(), "user-123412341234");
         assertEquals(auth.getUserID(), "jinhong0719");
         assertEquals(auth.getUserPW(), "testPW");
+        assertFalse(auth.isHaveUsed());
+        assertFalse(auth.isLocked());
         assertTrue("error", auth.getCreatedAt().isAfter(now));
         assertTrue("error", auth.getUpdatedAt().isAfter(now));
         assertEquals(inform.getUserAuth().getUuid(), "user-123412341234");
