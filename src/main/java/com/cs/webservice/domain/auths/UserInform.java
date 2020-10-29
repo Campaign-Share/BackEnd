@@ -1,10 +1,7 @@
 package com.cs.webservice.domain.auths;
 
 import com.cs.webservice.domain.BaseTimeEntity;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -12,6 +9,7 @@ import javax.validation.constraints.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name = "user_informs")
 public class UserInform extends BaseTimeEntity {
@@ -31,8 +29,7 @@ public class UserInform extends BaseTimeEntity {
     @Size(max = 10) @NotNull
     private String nickName;
 
-    @Column(nullable = false, length = 11, name = "phone_number", columnDefinition = "CHAR(11)")
-    @Size(min = 11, max = 11) @NotNull @NotEmpty
-    @Pattern(regexp = "^010\\d{8}")
-    private String phoneNumber;
+    @Column(nullable = false, length = 30, name = "email")
+    @Size(max = 30) @NotNull @NotEmpty @Email
+    private String email;
 }
