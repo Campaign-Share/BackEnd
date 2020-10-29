@@ -32,4 +32,12 @@ public class UserInform extends BaseTimeEntity {
     @Column(nullable = false, length = 30, name = "email")
     @Size(max = 30) @NotNull @NotEmpty @Email
     private String email;
+
+    @Builder
+    public UserInform(String name, String nickName, String email) {
+        this.userAuth = new UserAuth();
+        this.name = name;
+        this.nickName = nickName;
+        this.email = email;
+    }
 }
