@@ -1,5 +1,6 @@
 package com.cs.webservice.domain.auths;
 
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -16,7 +17,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Entity
 @Table(name = "email_certifies")
-public class EmailCertify {
+public class EmailCertify extends BaseTimeEntity {
     @Id
     @Column(unique = true, nullable = false, length = 30, name = "email")
     @Size(max = 30) @NotNull @NotEmpty @Email
