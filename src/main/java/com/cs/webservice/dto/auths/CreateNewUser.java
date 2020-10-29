@@ -29,10 +29,9 @@ public class CreateNewUser {
         @JsonProperty("nick_name")
         private String nickName;
 
-        @Size(min = 11,max = 11) @NotNull @NotEmpty
-        @JsonProperty("phone_number")
-        @Pattern(regexp = "^010\\d{8}")
-        private String phoneNumber;
+        @Size(min = 11,max = 11) @NotNull @NotEmpty @Email
+        @JsonProperty("email")
+        private String email;
     }
 
     @NoArgsConstructor
