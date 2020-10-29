@@ -30,8 +30,8 @@ public class EmailCertify extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "certified")
     private boolean certified;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "using")
-    private boolean using;
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "is_using")
+    private boolean isUsing;
 
     @Builder
     public EmailCertify(String email, String authCode) {
