@@ -3,9 +3,15 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_ADDRESS:localhost}:3306/CampaignShareDB?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_ADDRESS:localhost}:3306/CampaignShareDB?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: richimous0719@gmail.com
+    password: ${GMAIL_PASSWORD:none}
+    protocol: smtp
