@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
 
 public interface AuthHandler {
-    CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request dto, BindingResult bindingResult);
+    CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult);
 }
