@@ -29,7 +29,7 @@ public class UserInform extends BaseTimeEntity {
     @Size(max = 10) @NotNull
     private String nickName;
 
-    @Column(nullable = false, length = 30, name = "email")
+    @Column(nullable = false, length = 30, name = "email", unique = true)
     @Size(max = 30) @NotNull @NotEmpty @Email
     private String email;
 
