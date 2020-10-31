@@ -1,4 +1,4 @@
-package com.cs.webservice.domain.auths;
+package com.cs.webservice.domain.auth;
 
 import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;

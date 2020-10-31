@@ -1,4 +1,4 @@
-package com.cs.webservice.dto.auths;
+package com.cs.webservice.dto.auth;
 
 import com.cs.webservice.dto.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package com.cs.webservice.domain.auths.repository;
+package com.cs.webservice.domain.auth.repository;
 
 import com.cs.webservice.domain.auths.EmailCertify;
 import org.springframework.data.jpa.repository.JpaRepository;

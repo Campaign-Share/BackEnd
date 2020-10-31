@@ -1,4 +1,4 @@
-package com.cs.webservice.dto.auths;
+package com.cs.webservice.dto.auth;
 
 import com.cs.webservice.domain.auths.UserAuth;
 import com.cs.webservice.domain.auths.UserInform;

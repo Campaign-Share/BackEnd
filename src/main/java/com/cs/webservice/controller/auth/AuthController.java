@@ -1,4 +1,4 @@
-package com.cs.webservice.controller.auths;
+package com.cs.webservice.controller.auth;
 
 import com.cs.webservice.domain.auths.repository.UserAuthRepository;
 import com.cs.webservice.dto.auths.CreateNewUser;
