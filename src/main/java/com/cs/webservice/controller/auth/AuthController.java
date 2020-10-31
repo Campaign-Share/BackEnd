@@ -1,8 +1,10 @@
 package com.cs.webservice.controller.auth;
 
-import com.cs.webservice.domain.auths.repository.UserAuthRepository;
-import com.cs.webservice.dto.auths.CreateNewUser;
+import com.cs.webservice.domain.auth.repository.UserAuthRepository;
+import com.cs.webservice.dto.auth.CreateNewUser;
+import com.cs.webservice.handler.auth.AuthHandlerImpl;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,21 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
-    private UserAuthRepository userAuthRepository;
+    private final AuthHandlerImpl authHandler;
 
     @PostMapping(value = "/v1/users", consumes = {"application/json"})
-    public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request dto, BindingResult bindingResult) {
-        var resp = new CreateNewUser.Response();
-        if (bindingResult.hasErrors()) {
-            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
-            resp.setMessage(bindingResult.getAllErrors().toString());
-            return resp;
-        }
-
-        System.out.println(dto);
-        resp.setStatus(HttpStatus.SC_OK);
-        return resp;
+    public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult) {
+        return authHandler.createNewUser(req, bindingResult);
     }
 }
