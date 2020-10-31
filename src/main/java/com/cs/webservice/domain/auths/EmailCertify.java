@@ -23,8 +23,8 @@ public class EmailCertify extends BaseTimeEntity {
     @Size(max = 30) @NotNull @NotEmpty @Email
     private String email;
 
-    @Column(nullable = false, length = 6, columnDefinition = "CHAR(6)", name = "auth_code")
-    @Size(min = 6, max = 6) @NotNull @NotEmpty
+    @Column(nullable = false, length = 8, columnDefinition = "CHAR(8)", name = "auth_code")
+    @Size(min = 8, max = 8) @NotNull @NotEmpty
     private String authCode;
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "certified")
