@@ -11,4 +11,14 @@ public class Random {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
+
+    public static String generateNumberString(int targetStringLength) {
+        int leftLimit = 48;
+        int rightLimit = 57;
+        java.util.Random random = new java.util.Random();
+        return random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
 }
