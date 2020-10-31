@@ -2,12 +2,14 @@ package com.cs.webservice.controller.auth;
 
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.dto.auth.SendEmail;
+import com.cs.webservice.dto.auth.VerifyEmail;
 import com.cs.webservice.handler.auth.EmailHandlerImpl;
 import com.cs.webservice.utils.Random;
 import lombok.AllArgsConstructor;
 import org.apache.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +20,13 @@ import javax.validation.Valid;
 public class EmailController {
     private final EmailHandlerImpl emailHandler;
 
-    @PostMapping(value = "/v1/emails", consumes = {"application/json"})
+    @PostMapping(value = "/v1/email/verify", consumes = {"application/json"})
     public SendEmail.Response sendEmail(@Valid @RequestBody SendEmail.Request req, BindingResult bindingResult) {
         return emailHandler.sendEmail(req, bindingResult);
+    }
+
+    @PutMapping(value = "/v1/email/verify", consumes = {"application/json"})
+    public VerifyEmail.Response verifyEmail(@Valid @RequestBody VerifyEmail.Request req, BindingResult bindingResult) {
+        return emailHandler.verifyEmail(req, bindingResult);
     }
 }
