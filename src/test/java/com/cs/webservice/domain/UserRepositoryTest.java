@@ -1,10 +1,9 @@
 package com.cs.webservice.domain;
 
-import com.cs.webservice.domain.auths.UserAuth;
-import com.cs.webservice.domain.auths.UserInform;
-import com.cs.webservice.domain.auths.repository.UserAuthRepository;
-import com.cs.webservice.domain.auths.repository.UserInformRepository;
-import org.joda.time.LocalDateTime;
+import com.cs.webservice.domain.auth.UserAuth;
+import com.cs.webservice.domain.auth.UserInform;
+import com.cs.webservice.domain.auth.repository.UserAuthRepository;
+import com.cs.webservice.domain.auth.repository.UserInformRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
