@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface EmailCertifyRepository extends JpaRepository<EmailCertify, String> {
     Optional<EmailCertify> findByEmail(String email);
+    Optional<EmailCertify> findByEmailAndCertified(String email, Boolean certified);
 }
