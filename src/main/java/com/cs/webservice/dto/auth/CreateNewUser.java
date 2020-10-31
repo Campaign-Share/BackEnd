@@ -1,7 +1,5 @@
 package com.cs.webservice.dto.auth;
 
-import com.cs.webservice.domain.auths.UserAuth;
-import com.cs.webservice.domain.auths.UserInform;
 import com.cs.webservice.dto.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
