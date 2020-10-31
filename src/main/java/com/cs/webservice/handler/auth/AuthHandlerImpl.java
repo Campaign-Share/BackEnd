@@ -9,6 +9,7 @@ import com.cs.webservice.domain.auth.repository.UserInformRepository;
 import com.cs.webservice.dto.auth.CreateNewUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,9 +68,9 @@ public class AuthHandlerImpl implements AuthHandler {
             return resp;
         }
 
-        // 비밀번호 해싱 추가
+        req.setUserPW(new BCryptPasswordEncoder().encode(req.getUserPW()));
 
-       String userUUID = userAuthRepository.getAvailableUUID();
+        String userUUID = userAuthRepository.getAvailableUUID();
         UserAuth userAuth = UserAuth.builder()
                 .uuid(userUUID)
                 .userId(req.getUserID())
