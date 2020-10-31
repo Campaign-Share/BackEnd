@@ -3,6 +3,7 @@ package com.cs.webservice.handler.auth;
 import com.cs.webservice.domain.auth.EmailCertify;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.dto.auth.SendEmail;
+import com.cs.webservice.dto.auth.VerifyEmail;
 import com.cs.webservice.utils.Random;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
@@ -73,5 +74,50 @@ public class EmailHandlerImpl implements EmailHandler {
         resp.setStatus(HttpStatus.SC_OK);
         resp.setMessage("succeed to register sending email to certify");
         return resp;
+    }
+
+    @Override
+    public VerifyEmail.Response verifyEmail(@Valid @RequestBody VerifyEmail.Request req, BindingResult bindingResult) {
+        var resp = new VerifyEmail.Response();
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return resp;
+        }
+
+        Optional<EmailCertify> selectResult = emailCertifyRepository.findByEmail(req.getEmail());
+        if (selectResult.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1011);
+            resp.setMessage("that email doesn't request authentication code");
+            return resp;
+        }
+
+        EmailCertify existEmail = selectResult.get();
+        if (existEmail.isCertified()) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1012);
+            resp.setMessage("that email was already authenticated");
+            return resp;
+        }
+
+        if (!existEmail.getAuthCode().equals(req.getAuthCode())) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1013);
+            resp.setMessage("that is an incorrect email authentication code");
+            return resp;
+        }
+
+        existEmail.setCertified(true);
+        emailCertifyRepository.save(existEmail);
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setMessage("succeed to certify email");
+        return resp;
+
+        // 존재 X -> -1011
+        // 이미 인증 됨 -> -1012
+        // 인증 코드 다름 -> -1013
+        // 인증 완료
     }
 }
