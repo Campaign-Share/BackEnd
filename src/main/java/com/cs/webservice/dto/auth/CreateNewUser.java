@@ -32,6 +32,10 @@ public class CreateNewUser {
         private String email;
     }
 
+    @Setter
     @NoArgsConstructor
-    public static class Response extends BaseResponse { }
+    public static class Response extends BaseResponse {
+        @JsonProperty("user_uuid")
+        private String userUUID;
+    }
 }
