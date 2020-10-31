@@ -4,18 +4,12 @@ import com.cs.webservice.domain.auth.EmailCertify;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.dto.auth.SendEmail;
 import com.cs.webservice.utils.Random;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,6 +63,7 @@ public class EmailHandlerImpl implements EmailHandler {
                 message.setFrom("richimous0719@gmail.com");
                 message.setTo(req.getEmail());
                 message.setSubject("캠페인쉐어 계정 생성을 위한 이메일 인증 코드입니다.");
+                message.setText("인증 코드: " + randomString);
                 javaMailSender.send(message);
             } catch (Exception e) {
                 logger.error("Can't send email... " + e.getMessage(), e);
