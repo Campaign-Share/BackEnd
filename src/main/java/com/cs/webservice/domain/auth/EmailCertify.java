@@ -15,7 +15,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@Entity
+@Setter
+@Entity(name = "email_certifies")
 @Table(name = "email_certifies")
 public class EmailCertify extends BaseTimeEntity {
     @Id
