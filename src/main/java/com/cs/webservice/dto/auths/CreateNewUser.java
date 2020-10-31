@@ -29,7 +29,7 @@ public class CreateNewUser {
         @JsonProperty("nick_name")
         private String nickName;
 
-        @Size(min = 11,max = 11) @NotNull @NotEmpty @Email
+        @Size(max = 30) @NotNull @NotEmpty @Email
         @JsonProperty("email")
         private String email;
     }
