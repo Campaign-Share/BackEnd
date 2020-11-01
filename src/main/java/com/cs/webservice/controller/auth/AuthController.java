@@ -2,6 +2,7 @@ package com.cs.webservice.controller.auth;
 
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.dto.auth.CreateNewUser;
+import com.cs.webservice.dto.auth.LoginUserAuth;
 import com.cs.webservice.handler.auth.AuthHandlerImpl;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +22,9 @@ public class AuthController {
     @PostMapping(value = "/v1/users", consumes = {"application/json"})
     public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult) {
         return authHandler.createNewUser(req, bindingResult);
+    }
+    @PostMapping(value = "/v1/login/user", consumes = {"application/json"})
+    public LoginUserAuth.Response loginUserAuth(@Valid @RequestBody LoginUserAuth.Request req, BindingResult bindingResult) {
+        return authHandler.loginUserAuth(req, bindingResult);
     }
 }
