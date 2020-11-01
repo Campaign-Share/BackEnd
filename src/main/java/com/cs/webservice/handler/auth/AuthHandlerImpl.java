@@ -6,10 +6,7 @@ import com.cs.webservice.domain.auth.UserInform;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
-import com.cs.webservice.dto.auth.ChangeUserPW;
-import com.cs.webservice.dto.auth.CreateNewUser;
-import com.cs.webservice.dto.auth.GetUserInform;
-import com.cs.webservice.dto.auth.LoginUserAuth;
+import com.cs.webservice.dto.auth.*;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -221,6 +218,41 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setNickName(userInform.getNickName());
         resp.setEmail(userInform.getEmail());
 
+        return resp;
+    }
+
+    @Override
+    public DeleteUser.Response deleteUser(String token, String userUUID) {
+        var resp = new DeleteUser.Response();
+
+        AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return resp;
+        }
+
+        if (!authenticateResult.uuid.equals(userUUID)) {
+            resp.setStatus(HttpStatus.SC_FORBIDDEN);
+            resp.setMessage("uuid in request uri is not your uuid");
+            return resp;
+        }
+
+        Optional<UserAuth> selectAuth = userAuthRepository.findById(userUUID);
+        if (selectAuth.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_NOT_FOUND);
+            resp.setMessage("not exist user uuid");
+            return resp;
+        }
+
+        UserAuth userAuth = selectAuth.get();
+        userInformRepository.findByUserAuth(userAuth)
+                .ifPresent(userInform -> emailCertifyRepository.deleteByEmail(userInform.getEmail()));
+        userAuthRepository.delete(selectAuth.get());
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setMessage("succeed to delete user");
         return resp;
     }
 }
