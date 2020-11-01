@@ -12,5 +12,5 @@ import javax.validation.Valid;
 public interface AuthHandler {
     CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult);
     LoginUserAuth.Response loginUserAuth(@Valid @RequestBody LoginUserAuth.Request req, BindingResult bindingResult);
-    ChangeUserPW.Response changeUserPW(@Valid @RequestBody @RequestHeader ChangeUserPW.Request req, BindingResult bindingResult, String token);
+    ChangeUserPW.Response changeUserPW(ChangeUserPW.Request req, BindingResult bindingResult, String token, String userUUID);
 }
