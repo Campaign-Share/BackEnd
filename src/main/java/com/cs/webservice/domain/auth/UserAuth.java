@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name = "user_auths")
 public class UserAuth extends BaseTimeEntity {
