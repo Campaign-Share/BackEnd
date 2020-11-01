@@ -141,4 +141,25 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setMessage("succeed to login user auth");
         return resp;
     }
+
+    @Override
+    public ChangeUserPW.Response changeUserPW(ChangeUserPW.Request req, BindingResult bindingResult, String token) {
+        var resp = new ChangeUserPW.Response();
+
+        AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return resp;
+        }
+
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return resp;
+        }
+
+        return resp;
+    }
 }
