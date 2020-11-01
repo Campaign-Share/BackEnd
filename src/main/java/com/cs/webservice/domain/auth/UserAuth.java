@@ -34,6 +34,10 @@ public class UserAuth extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "have_used")
     private boolean haveUsed;
 
+    @OneToOne(mappedBy = "userAuth", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private UserInform userInform;
+
     @Builder
     public UserAuth(String uuid, String userId, String userPW) {
         this.uuid = uuid;
