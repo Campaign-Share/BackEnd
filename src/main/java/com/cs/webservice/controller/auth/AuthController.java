@@ -25,7 +25,7 @@ public class AuthController {
     }
 
     @PutMapping(path = "/users/uuid/{user_uuid}/password", consumes = {"application/json"})
-    public ChangeUserPW.Response loginUserAuth(@RequestBody ChangeUserPW.Request req, @Valid BindingResult bindingResult,
+    public ChangeUserPW.Response loginUserAuth(@Valid @RequestBody ChangeUserPW.Request req, BindingResult bindingResult,
                                                @RequestHeader(value = "Authorization", required = false) String token,
                                                @PathVariable("user_uuid") String userUUID) {
         return authHandler.changeUserPW(req, bindingResult, token, userUUID);
@@ -39,7 +39,7 @@ public class AuthController {
 
     @DeleteMapping(path = "/users/uuid/{user_uuid}")
     public DeleteUser.Response deleteUser(@RequestHeader(value = "Authorization", required = false) String token,
-                                             @PathVariable("user_uuid") String userUUID) {
+                                          @PathVariable("user_uuid") String userUUID) {
         return authHandler.deleteUser(token, userUUID);
     }
 }
