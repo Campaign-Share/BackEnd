@@ -1,9 +1,6 @@
 package com.cs.webservice.handler.auth;
 
-import com.cs.webservice.dto.auth.ChangeUserPW;
-import com.cs.webservice.dto.auth.CreateNewUser;
-import com.cs.webservice.dto.auth.GetUserInform;
-import com.cs.webservice.dto.auth.LoginUserAuth;
+import com.cs.webservice.dto.auth.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,4 +12,5 @@ public interface AuthHandler {
     LoginUserAuth.Response loginUserAuth(@Valid @RequestBody LoginUserAuth.Request req, BindingResult bindingResult);
     ChangeUserPW.Response changeUserPW(ChangeUserPW.Request req, BindingResult bindingResult, String token, String userUUID);
     GetUserInform.Response getUserInform(String token, String userUUID);
+    DeleteUser.Response deleteUser(String token, String userUUID);
 }
