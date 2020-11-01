@@ -2,6 +2,7 @@ package com.cs.webservice.controller.auth;
 
 import com.cs.webservice.dto.auth.ChangeUserPW;
 import com.cs.webservice.dto.auth.CreateNewUser;
+import com.cs.webservice.dto.auth.GetUserInform;
 import com.cs.webservice.dto.auth.LoginUserAuth;
 import com.cs.webservice.handler.auth.AuthHandlerImpl;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,11 @@ public class AuthController {
                                                @RequestHeader(value = "Authorization", required = false) String token,
                                                @PathVariable("user_uuid") String userUUID) {
         return authHandler.changeUserPW(req, bindingResult, token, userUUID);
+    }
+
+    @GetMapping(path = "/users/uuid/{user_uuid}")
+    public GetUserInform.Response getUserInform(@RequestHeader(value = "Authorization", required = false) String token,
+                                                @PathVariable("user_uuid") String userUUID) {
+        return authHandler.getUserInform(token, userUUID);
     }
 }
