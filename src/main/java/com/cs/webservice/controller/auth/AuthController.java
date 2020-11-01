@@ -1,5 +1,6 @@
 package com.cs.webservice.controller.auth;
 
+import com.cs.webservice.dto.auth.ChangeUserPW;
 import com.cs.webservice.dto.auth.CreateNewUser;
 import com.cs.webservice.dto.auth.LoginUserAuth;
 import com.cs.webservice.handler.auth.AuthHandlerImpl;
@@ -23,5 +24,12 @@ public class AuthController {
     @PostMapping(path = "/login/user", consumes = {"application/json"})
     public LoginUserAuth.Response loginUserAuth(@Valid @RequestBody LoginUserAuth.Request req, BindingResult bindingResult) {
         return authHandler.loginUserAuth(req, bindingResult);
+    }
+
+    @PutMapping(path = "/users/uuid/{user_uuid}/password", consumes = {"application/json"})
+    public ChangeUserPW.Response loginUserAuth(@RequestBody ChangeUserPW.Request req, @Valid BindingResult bindingResult,
+                                               @RequestHeader(value = "Authorization", required = false) String token,
+                                               @PathVariable("user_uuid") String userUUID) {
+        return authHandler.changeUserPW(req, bindingResult, token, userUUID);
     }
 }
