@@ -8,6 +8,7 @@ import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
 import com.cs.webservice.dto.auth.ChangeUserPW;
 import com.cs.webservice.dto.auth.CreateNewUser;
+import com.cs.webservice.dto.auth.GetUserInform;
 import com.cs.webservice.dto.auth.LoginUserAuth;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.JwtTokenProvider;
@@ -182,6 +183,44 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
         resp.setStatus(HttpStatus.SC_OK);
         resp.setMessage("succeed to change password");
+        return resp;
+    }
+
+    @Override
+    public GetUserInform.Response getUserInform(String token, String userUUID) {
+        var resp = new GetUserInform.Response();
+
+        AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return resp;
+        }
+
+        Optional<UserAuth> selectResult = userAuthRepository.findById(userUUID);
+        if (selectResult.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_NOT_FOUND);
+            resp.setMessage("not exist user uuid");
+            return resp;
+        }
+
+        UserAuth userAuth = selectResult.get();
+        Optional<UserInform> selectInform = userInformRepository.findByUserAuth(userAuth);
+        if (selectInform.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_NOT_FOUND);
+            resp.setMessage("not exist user uuid in user inform");
+            return resp;
+        }
+        UserInform userInform = selectInform.get();
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setMessage("succeed to get user inform");
+        resp.setUserUUID(userInform.getUserAuth().getUuid());
+        resp.setName(userInform.getName());
+        resp.setNickName(userInform.getNickName());
+        resp.setEmail(userInform.getEmail());
+
         return resp;
     }
 }
