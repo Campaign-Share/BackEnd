@@ -6,23 +6,29 @@ import com.cs.webservice.domain.auth.UserInform;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
+import com.cs.webservice.dto.auth.ChangeUserPW;
 import com.cs.webservice.dto.auth.CreateNewUser;
 import com.cs.webservice.dto.auth.LoginUserAuth;
+import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.JwtTokenProvider;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.apache.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthHandlerImpl implements AuthHandler {
+public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
     private final UserAuthRepository userAuthRepository;
 
     private final UserInformRepository userInformRepository;
@@ -32,7 +38,7 @@ public class AuthHandlerImpl implements AuthHandler {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult) {
+    public CreateNewUser.Response createNewUser(CreateNewUser.Request req, BindingResult bindingResult) {
         var resp = new CreateNewUser.Response();
         if (bindingResult.hasErrors()) {
             resp.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -102,7 +108,7 @@ public class AuthHandlerImpl implements AuthHandler {
     }
 
     @Override
-    public LoginUserAuth.Response loginUserAuth(@Valid @RequestBody LoginUserAuth.Request req, BindingResult bindingResult) {
+    public LoginUserAuth.Response loginUserAuth(LoginUserAuth.Request req, BindingResult bindingResult) {
         var resp = new LoginUserAuth.Response();
         if (bindingResult.hasErrors()) {
             resp.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -130,7 +136,7 @@ public class AuthHandlerImpl implements AuthHandler {
         }
 
         resp.setStatus(HttpStatus.SC_OK);
-        resp.setAccessToken(jwtTokenProvider.createToken(userAuth.getUuid()));
+        resp.setAccessToken(jwtTokenProvider.generateAccessToken(userAuth.getUuid()));
         resp.setUserUUID(userAuth.getUuid());
         resp.setMessage("succeed to login user auth");
         return resp;
