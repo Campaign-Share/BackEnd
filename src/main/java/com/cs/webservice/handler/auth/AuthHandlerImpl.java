@@ -11,19 +11,13 @@ import com.cs.webservice.dto.auth.CreateNewUser;
 import com.cs.webservice.dto.auth.LoginUserAuth;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.JwtTokenProvider;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.apache.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
-import javax.validation.Valid;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -143,7 +137,7 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
     }
 
     @Override
-    public ChangeUserPW.Response changeUserPW(ChangeUserPW.Request req, BindingResult bindingResult, String token) {
+    public ChangeUserPW.Response changeUserPW(ChangeUserPW.Request req, BindingResult bindingResult, String token, String userUUID) {
         var resp = new ChangeUserPW.Response();
 
         AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -160,6 +154,34 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             return resp;
         }
 
+        if (!authenticateResult.uuid.equals(userUUID)) {
+            resp.setStatus(HttpStatus.SC_FORBIDDEN);
+            resp.setMessage("uuid in request uri is not your uuid");
+            return resp;
+        }
+
+        Optional<UserAuth> selectResult = userAuthRepository.findById(userUUID);
+        if (selectResult.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_NOT_FOUND);
+            resp.setMessage("not exist user uuid");
+            return resp;
+        }
+
+        // 현재 비밀번호 일치 X -> -1041
+
+        UserAuth userAuth = selectResult.get();
+        if (!BCrypt.checkpw(req.getCurrentPW(), userAuth.getUserPW())) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1041);
+            resp.setMessage("incorrect current password");
+            return resp;
+        }
+
+        userAuth.setUserPW(new BCryptPasswordEncoder().encode(req.getRevisionPW()));
+        userAuthRepository.save(userAuth);
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setMessage("succeed to change password");
         return resp;
     }
 }
