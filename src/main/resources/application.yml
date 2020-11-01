@@ -15,3 +15,9 @@ spring:
     username: richimous0719@gmail.com
     password: ${GMAIL_PASSWORD:none}
     protocol: smtp
+
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET_KEY:a1b2c3d4!@#$a1b2c3d4!@#$a1b2c3d4!@#$}
+      expire-length: ${JWT_EXPIRE_AT:86400}
