@@ -42,4 +42,11 @@ public class AuthController {
                                           @PathVariable("user_uuid") String userUUID) {
         return authHandler.deleteUser(token, userUUID);
     }
+
+    @PatchMapping(path = "/users/uuid/{user_uuid}")
+    public ChangeUserInform.Response changeUserInform(@Valid @RequestBody ChangeUserInform.Request req, BindingResult bindingResult,
+                                                      @RequestHeader(value = "Authorization", required = false) String token,
+                                                      @PathVariable("user_uuid") String userUUID) {
+        return authHandler.changeUserInform(req, bindingResult, token, userUUID);
+    }
 }
