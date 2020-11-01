@@ -255,4 +255,90 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setMessage("succeed to delete user");
         return resp;
     }
+
+    @Override
+    public ChangeUserInform.Response changeUserInform(ChangeUserInform.Request req, BindingResult bindingResult, String token, String userUUID) {
+        var resp = new ChangeUserInform.Response();
+
+        AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return resp;
+        }
+
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            System.out.println(bindingResult.getAllErrors().toString() + "qweqwe");
+            return resp;
+        }
+
+        if (!authenticateResult.uuid.equals(userUUID)) {
+            resp.setStatus(HttpStatus.SC_FORBIDDEN);
+            resp.setMessage("uuid in request uri is not your uuid");
+            return resp;
+        }
+
+        Optional<UserAuth> selectAuth = userAuthRepository.findById(userUUID);
+        if (selectAuth.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_NOT_FOUND);
+            resp.setMessage("not exist user uuid");
+            return resp;
+        }
+
+        // 인증되지 않은 email임 -> -1051
+        // 이미 사용중인 email임 -> -1052
+        // email 중복 -> -1053
+
+        if (req.getEmail() != null) {
+            Optional<EmailCertify> selectEmail = emailCertifyRepository.findByEmailAndCertified(req.getEmail(), true);
+            if (selectEmail.isEmpty()) {
+                resp.setStatus(HttpStatus.SC_CONFLICT);
+                resp.setCode(-1051);
+                resp.setMessage("not certify email");
+                return resp;
+            }
+            if (selectEmail.get().isUsing()) {
+                resp.setStatus(HttpStatus.SC_CONFLICT);
+                resp.setCode(-1052);
+                resp.setMessage("email is already used");
+                return resp;
+            }
+        }
+
+        if (userInformRepository.findByEmail(req.getEmail()).isPresent()) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1053);
+            resp.setMessage("email duplicate error");
+            return resp;
+        }
+
+        Optional<UserInform> selectInform = userInformRepository.findByUserAuth(selectAuth.get());
+        if (selectInform.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_NOT_FOUND);
+            resp.setMessage("not exist user uuid in user inform");
+            return resp;
+        }
+
+        UserInform userInform = selectInform.get();
+        if (req.getEmail() != null) {
+            userInform.setEmail(req.getEmail());
+        }
+        if (req.getName() != null) {
+            userInform.setName(req.getName());
+        }
+        if (req.getNickName() != null) {
+            userInform.setNickName(req.getNickName());
+        }
+        userInformRepository.save(userInform);
+
+        emailCertifyRepository.findByEmail(userInform.getEmail())
+                .ifPresent(emailCertify -> emailCertifyRepository.deleteByEmail(emailCertify.getEmail()));
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setMessage("Succeed to change user inform");
+        return resp;
+    }
 }
