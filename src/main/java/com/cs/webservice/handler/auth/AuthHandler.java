@@ -13,4 +13,5 @@ public interface AuthHandler {
     ChangeUserPW.Response changeUserPW(ChangeUserPW.Request req, BindingResult bindingResult, String token, String userUUID);
     GetUserInform.Response getUserInform(String token, String userUUID);
     DeleteUser.Response deleteUser(String token, String userUUID);
+    ChangeUserInform.Response changeUserInform(ChangeUserInform.Request req, BindingResult bindingResult, String token, String userUUID);
 }
