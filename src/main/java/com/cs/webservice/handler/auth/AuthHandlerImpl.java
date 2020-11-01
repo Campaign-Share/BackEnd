@@ -29,6 +29,8 @@ public class AuthHandlerImpl implements AuthHandler {
 
     private final EmailCertifyRepository emailCertifyRepository;
 
+    private final JwtTokenProvider jwtTokenProvider;
+
     @Override
     public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult) {
         var resp = new CreateNewUser.Response();
@@ -96,6 +98,41 @@ public class AuthHandlerImpl implements AuthHandler {
         resp.setStatus(HttpStatus.SC_CREATED);
         resp.setMessage("succeed to create new user");
         resp.setUserUUID(userUUID);
+        return resp;
+    }
+
+    @Override
+    public LoginUserAuth.Response loginUserAuth(@Valid @RequestBody LoginUserAuth.Request req, BindingResult bindingResult) {
+        var resp = new LoginUserAuth.Response();
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return resp;
+        }
+
+        // 아이디 없음 -> -1031
+        // 비밀번호 오류 -> -1032
+
+        Optional<UserAuth> selectResult = userAuthRepository.findByUserID(req.getUserID());
+        if (selectResult.isEmpty()) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1031);
+            resp.setMessage("not exist user id");
+            return resp;
+        }
+
+        UserAuth userAuth = selectResult.get();
+        if (!BCrypt.checkpw(req.getUserPW(), userAuth.getUserPW())) {
+            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setCode(-1032);
+            resp.setMessage("incorrect user password");
+            return resp;
+        }
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setAccessToken(jwtTokenProvider.createToken(userAuth.getUuid()));
+        resp.setUserUUID(userAuth.getUuid());
+        resp.setMessage("succeed to login user auth");
         return resp;
     }
 }
