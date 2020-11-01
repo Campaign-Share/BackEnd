@@ -7,8 +7,11 @@ import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
 import com.cs.webservice.dto.auth.CreateNewUser;
+import com.cs.webservice.dto.auth.LoginUserAuth;
+import com.cs.webservice.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -21,7 +24,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthHandlerImpl implements AuthHandler {
     private final UserAuthRepository userAuthRepository;
+
     private final UserInformRepository userInformRepository;
+
     private final EmailCertifyRepository emailCertifyRepository;
 
     @Override
@@ -88,8 +93,7 @@ public class AuthHandlerImpl implements AuthHandler {
         certifiedEmail.setUsing(true);
         emailCertifyRepository.save(certifiedEmail);
 
-        System.out.println(req);
-        resp.setStatus(HttpStatus.SC_OK);
+        resp.setStatus(HttpStatus.SC_CREATED);
         resp.setMessage("succeed to create new user");
         resp.setUserUUID(userUUID);
         return resp;
