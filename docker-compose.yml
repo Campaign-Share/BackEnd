@@ -1,0 +1,21 @@
+version: '3.5'
+services:
+  campaign-share:
+    image: jinhong0719/campaign-share:${VERSION}.RELEASE
+    container_name: campaign-share
+    networks:
+      - campaign_share_local
+    ports:
+      - 80:80
+    environment:
+      - MYSQL_ADDRESS: ${MYSQL_ADDRESS}
+      - MYSQL_USERNAME: ${MYSQL_USERNAME}
+      - MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      - GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+      - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      - JWT_EXPIRE_AT: ${JWT_EXPIRE_AT}
+
+networks:
+  campaign_share_local:
+    name: campaign_share_local
+    driver: bridge
