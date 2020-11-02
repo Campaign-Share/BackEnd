@@ -1,13 +1,14 @@
 version: '3.5'
 
 services:
-  mysql:
+  campaign_share_mysql:
     image: mysql:8.0
     container_name: campaign_share_mysql
     volumes:
       - campaign_share_db_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ChampaignShareDB
     networks:
       - campaign_share_local
     ports:
