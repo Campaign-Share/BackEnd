@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'com.cs'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = '11'
 
 configurations {
@@ -35,7 +35,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'com.h2database:h2'
-
+	implementation 'javax.xml.bind:jaxb-api:2.3.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
 	runtime 'io.jsonwebtoken:jjwt-impl:0.10.7'
 	runtime 'io.jsonwebtoken:jjwt-jackson:0.10.7'
