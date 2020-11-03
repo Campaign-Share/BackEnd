@@ -1,4 +1,4 @@
-package com.cs.webservice.config.email;
+package com.cs.webservice.config;
 
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
