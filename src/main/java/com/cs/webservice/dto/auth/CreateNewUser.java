@@ -3,6 +3,7 @@ package com.cs.webservice.dto.auth;
 import com.cs.webservice.dto.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 
@@ -30,6 +31,10 @@ public class CreateNewUser {
         @Size(max = 30) @NotNull @NotEmpty @Email
         @JsonProperty("email")
         private String email;
+
+        @NotNull
+        @JsonProperty("profile")
+        private MultipartFile profile;
     }
 
     @Setter
