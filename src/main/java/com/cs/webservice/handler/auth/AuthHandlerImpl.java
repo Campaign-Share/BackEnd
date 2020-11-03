@@ -8,6 +8,7 @@ import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
 import com.cs.webservice.dto.auth.*;
 import com.cs.webservice.handler.BaseHandler;
+import com.cs.webservice.utils.AmazonS3ClientService;
 import com.cs.webservice.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
@@ -29,6 +30,8 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final AmazonS3ClientService amazonS3ClientService;
+
     @Override
     public CreateNewUser.Response createNewUser(CreateNewUser.Request req, BindingResult bindingResult) {
         var resp = new CreateNewUser.Response();
@@ -37,6 +40,14 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             resp.setMessage(bindingResult.getAllErrors().toString());
             return resp;
         }
+
+//        try {
+//            amazonS3ClientService.uploadFileToS3Bucket(req.getProfile(), "profiles/user-123412341234", true);
+//        } catch (Exception ex) {
+//            resp.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+//            resp.setMessage(ex.toString());
+//            return resp;
+//        }
 
         // 인증되지 않은 email임 -> -1021
         // 이미 사용중인 email임 -> -1022
