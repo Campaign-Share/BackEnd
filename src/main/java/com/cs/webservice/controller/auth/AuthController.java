@@ -14,8 +14,8 @@ import javax.validation.Valid;
 public class AuthController {
     private final AuthHandlerImpl authHandler;
 
-    @PostMapping(path = "/users", consumes = {"application/json"})
-    public CreateNewUser.Response createNewUser(@Valid @RequestBody CreateNewUser.Request req, BindingResult bindingResult) {
+    @PostMapping(path = "/users", consumes = {"multipart/form-data"})
+    public CreateNewUser.Response createNewUser(@Valid @ModelAttribute CreateNewUser.Request req, BindingResult bindingResult) {
         return authHandler.createNewUser(req, bindingResult);
     }
 
@@ -25,7 +25,7 @@ public class AuthController {
     }
 
     @PutMapping(path = "/users/uuid/{user_uuid}/password", consumes = {"application/json"})
-    public ChangeUserPW.Response loginUserAuth(@Valid @RequestBody ChangeUserPW.Request req, BindingResult bindingResult,
+    public ChangeUserPW.Response changeUserPW(@Valid @RequestBody ChangeUserPW.Request req, BindingResult bindingResult,
                                                @RequestHeader(value = "Authorization", required = false) String token,
                                                @PathVariable("user_uuid") String userUUID) {
         return authHandler.changeUserPW(req, bindingResult, token, userUUID);
