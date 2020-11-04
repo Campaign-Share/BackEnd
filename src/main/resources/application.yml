@@ -25,12 +25,14 @@ security:
       secret-key: ${JWT_SECRET_KEY:a1b2c3d4!@#$a1b2c3d4!@#$a1b2c3d4!@#$}
       expire-length: ${JWT_EXPIRE_AT:86400}
 
-aws:
-  access:
-    key:
-      id: ${CAMPAIGN_SHARE_AWS_ID}
-      secret: ${CAMPAIGN_SHARE_AWS_SECRET}
-  region: ap-northeast-2
-  s3:
-    audio:
+cloud:
+  aws:
+    credentials:
+      accessKey: ${CAMPAIGN_SHARE_AWS_ID}
+      secretKey: ${CAMPAIGN_SHARE_AWS_SECRET}
+    s3:
       bucket: campaignshare
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
