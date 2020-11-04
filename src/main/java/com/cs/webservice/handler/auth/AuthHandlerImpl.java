@@ -228,6 +228,7 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setName(userInform.getName());
         resp.setNickName(userInform.getNickName());
         resp.setEmail(userInform.getEmail());
+        resp.setProfileURI(userInform.getProfileURI());
 
         return resp;
     }
@@ -273,7 +274,7 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
     }
 
     @Override
-    public ChangeUserInform.Response changeUserInform(ChangeUserInform.Request req, BindingResult bindingResult, String token, String userUUID) {
+    public ChangeUserInform.Response changeUserInform(ChangeUserInform.Request req, BindingResult bindingResult, String token, String userUUID) throws IOException {
         var resp = new ChangeUserInform.Response();
 
         AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -340,6 +341,17 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
         UserInform userInform = selectInform.get();
         if (req.getEmail() != null) {
+            emailCertifyRepository.findByEmail(userInform.getEmail())
+                    .ifPresent(emailCertify -> {
+                        System.out.println(emailCertify.getEmail() + "1");
+                        emailCertifyRepository.deleteByEmail(emailCertify.getEmail());
+                    });
+            emailCertifyRepository.findByEmail(req.getEmail())
+                    .ifPresent(emailCertify -> {
+                        System.out.println(emailCertify.getEmail() + "2");
+                        emailCertify.setUsing(true);
+                        emailCertifyRepository.save(emailCertify);
+                    });
             userInform.setEmail(req.getEmail());
         }
         if (req.getName() != null) {
@@ -348,10 +360,14 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         if (req.getNickName() != null) {
             userInform.setNickName(req.getNickName());
         }
-        userInformRepository.save(userInform);
 
-        emailCertifyRepository.findByEmail(userInform.getEmail())
-                .ifPresent(emailCertify -> emailCertifyRepository.deleteByEmail(emailCertify.getEmail()));
+        if (req.getProfile() != null) {
+            String profileURI = "profiles/" + userUUID;
+            userInform.setProfileURI(profileURI);
+            s3Service.upload(req.getProfile(), profileURI);
+        }
+
+        userInformRepository.save(userInform);
 
         resp.setStatus(HttpStatus.SC_OK);
         resp.setMessage("Succeed to change user inform");
