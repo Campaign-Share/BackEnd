@@ -11,6 +11,8 @@ public class GetUserInform {
     public static class Response extends BaseResponse {
         @JsonProperty("user_uuid")
         private String userUUID;
+        @JsonProperty("user_id")
+        private String userID;
         @JsonProperty("name")
         private String name;
         @JsonProperty("nick_name")
