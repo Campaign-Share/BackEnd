@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class AuthController {
     private final AuthHandlerImpl authHandler;
 
     @PostMapping(path = "/users", consumes = {"multipart/form-data"})
-    public CreateNewUser.Response createNewUser(@Valid @ModelAttribute CreateNewUser.Request req, BindingResult bindingResult) {
+    public CreateNewUser.Response createNewUser(@Valid @ModelAttribute CreateNewUser.Request req, BindingResult bindingResult) throws IOException {
         return authHandler.createNewUser(req, bindingResult);
     }
 
