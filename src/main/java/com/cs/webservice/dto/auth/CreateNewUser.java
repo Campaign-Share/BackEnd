@@ -32,7 +32,6 @@ public class CreateNewUser {
         @JsonProperty("email")
         private String email;
 
-        @NotNull
         @JsonProperty("profile")
         private MultipartFile profile;
     }
