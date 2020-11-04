@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -62,6 +63,9 @@ public class Campaign extends BaseTimeEntity {
     @Column(length = 100, name = "post_uri")
     @Size(max = 100)
     private String postURI;
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
+    private Set<CampaignTag> campaignTags;
 
     @Builder
     public Campaign(String uuid, String userUUID, String title, String subTitle, String introduction,
