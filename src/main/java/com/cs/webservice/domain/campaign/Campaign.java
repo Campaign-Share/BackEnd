@@ -62,4 +62,21 @@ public class Campaign extends BaseTimeEntity {
     @Column(length = 100, name = "post_uri")
     @Size(max = 100)
     private String postURI;
+
+    @Builder
+    public Campaign(String uuid, String userUUID, String title, String subTitle, String introduction,
+                    String participation, LocalDate startDate, LocalDate endDate, String postURI) {
+        this.userAuth = new UserAuth();
+        this.adminAuth = new AdminAuth();
+
+        this.uuid = uuid;
+        this.userAuth.setUuid(userUUID);
+        this.title = title;
+        this.subTitle = subTitle;
+        this.introduction = introduction;
+        this.participation = participation;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.postURI = postURI;
+    }
 }
