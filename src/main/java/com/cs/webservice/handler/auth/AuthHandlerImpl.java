@@ -223,6 +223,7 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
         resp.setStatus(HttpStatus.SC_OK);
         resp.setMessage("succeed to get user inform");
+        resp.setUserID(userAuth.getUserID());
         resp.setUserUUID(userInform.getUserAuth().getUuid());
         resp.setName(userInform.getName());
         resp.setNickName(userInform.getNickName());
