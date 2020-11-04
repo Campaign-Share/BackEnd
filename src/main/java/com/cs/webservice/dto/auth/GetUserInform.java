@@ -19,5 +19,7 @@ public class GetUserInform {
         private String nickName;
         @JsonProperty("email")
         private String email;
+        @JsonProperty("profile_uri")
+        private String profileURI;
     }
 }
