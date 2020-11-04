@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -41,8 +42,8 @@ public class UserAuth extends BaseTimeEntity {
     @PrimaryKeyJoinColumn
     private UserInform userInform;
 
-    @OneToMany(mappedBy = "userAuth", cascade = CascadeType.ALL)
-    private Set<Campaign> campaigns;
+    @OneToMany(mappedBy = "userUUID", cascade = CascadeType.ALL)
+    private List<Campaign> campaigns;
 
     @Builder
     public UserAuth(String uuid, String userId, String userPW) {

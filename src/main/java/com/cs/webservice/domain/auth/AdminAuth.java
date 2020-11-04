@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -36,8 +37,8 @@ public class AdminAuth extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "locked")
     private boolean locked;
 
-    @OneToMany(mappedBy = "adminAuth", cascade = CascadeType.ALL)
-    private Set<Campaign> campaigns;
+    @OneToMany(mappedBy = "accepterUUID", cascade = CascadeType.ALL)
+    private List<Campaign> campaigns;
 
     @Builder
     public AdminAuth(String uuid, String userId, String userPW) {
