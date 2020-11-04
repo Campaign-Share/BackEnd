@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -27,6 +28,9 @@ public class ChangeUserInform {
         @Size(max = 30) @Email
         @JsonProperty("email")
         private String email;
+
+        @JsonProperty("profile")
+        private MultipartFile profile;
     }
 
     @Setter
