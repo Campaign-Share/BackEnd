@@ -1,18 +1,17 @@
 package com.cs.webservice.domain.auth;
 
 import com.cs.webservice.domain.BaseTimeEntity;
+import com.cs.webservice.domain.campaign.Campaign;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 @Getter
 @Setter
@@ -36,6 +35,9 @@ public class AdminAuth extends BaseTimeEntity {
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "locked")
     private boolean locked;
+
+    @OneToMany(mappedBy = "adminAuth", cascade = CascadeType.ALL)
+    private Set<Campaign> campaigns;
 
     @Builder
     public AdminAuth(String uuid, String userId, String userPW) {
