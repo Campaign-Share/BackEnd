@@ -258,7 +258,12 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
         UserAuth userAuth = selectAuth.get();
         userInformRepository.findByUserAuth(userAuth)
-                .ifPresent(userInform -> emailCertifyRepository.deleteByEmail(userInform.getEmail()));
+                .ifPresent(userInform -> {
+                    if (userInform.getProfileURI() != null) {
+                        s3Service.delete(userInform.getProfileURI());
+                    }
+                    emailCertifyRepository.deleteByEmail(userInform.getEmail());
+                });
         userAuthRepository.delete(selectAuth.get());
 
         resp.setStatus(HttpStatus.SC_OK);
