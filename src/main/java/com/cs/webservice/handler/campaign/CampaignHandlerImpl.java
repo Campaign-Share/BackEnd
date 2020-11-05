@@ -5,6 +5,7 @@ import com.cs.webservice.domain.campaign.CampaignTag;
 import com.cs.webservice.domain.campaign.repository.CampaignRepository;
 import com.cs.webservice.domain.campaign.repository.CampaignTagRepository;
 import com.cs.webservice.dto.campaign.CreateNewCampaign;
+import com.cs.webservice.dto.campaign.GetCampaignsWithUserUUID;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.JwtTokenProvider;
 import com.cs.webservice.utils.S3Service;
@@ -15,6 +16,7 @@ import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -102,6 +104,50 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setStatus(HttpStatus.SC_CREATED);
         resp.setMessage("succeed to create new campaign");
         resp.setCampaignUUID(campaignUUID);
+        return resp;
+    }
+
+    public GetCampaignsWithUserUUID.Response getCampaignsWithUserUUID(String token, String userUUID) {
+        var resp = new GetCampaignsWithUserUUID.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return resp;
+        }
+
+        if (!authenticateResult.uuid.equals(userUUID)) {
+            resp.setStatus(HttpStatus.SC_FORBIDDEN);
+            resp.setMessage("uuid in request uri is not your uuid");
+            return resp;
+        }
+
+        List<GetCampaignsWithUserUUID.Campaign> campaigns = new ArrayList<>();
+        campaignRepository.findAllByUserUUID(authenticateResult.uuid)
+                .forEach(campaign -> {
+                    GetCampaignsWithUserUUID.Campaign respCampaigns = GetCampaignsWithUserUUID.Campaign.builder()
+                            .campaignUUID(campaign.getUuid())
+                            .userUUID(campaign.getUserUUID())
+                            .title(campaign.getTitle())
+                            .subTitle(campaign.getSubTitle())
+                            .introduction(campaign.getIntroduction())
+                            .participation(campaign.getParticipation())
+                            .startDate(campaign.getStartDate())
+                            .endDate(campaign.getEndDate())
+                            .postURI(campaign.getPostURI()).build();
+
+                    List<String> respCampaignTags = new ArrayList<>();
+                    campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
+                            .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
+
+                    respCampaigns.setCampaignTags(respCampaignTags);
+                    campaigns.add(respCampaigns);
+                });
+
+        resp.setStatus(HttpStatus.SC_OK);
+        resp.setCampaigns(campaigns);
         return resp;
     }
 }
