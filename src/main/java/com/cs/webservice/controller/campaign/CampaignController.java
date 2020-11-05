@@ -1,6 +1,7 @@
 package com.cs.webservice.controller.campaign;
 
 import com.cs.webservice.dto.campaign.CreateNewCampaign;
+import com.cs.webservice.dto.campaign.GetCampaignsWithUserUUID;
 import com.cs.webservice.handler.campaign.CampaignHandlerImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
@@ -19,5 +20,11 @@ public class CampaignController {
     public CreateNewCampaign.Response createNewCampaign(@Valid @ModelAttribute CreateNewCampaign.Request req, BindingResult bindingResult,
                                                         @RequestHeader(value = "Authorization", required = false) String token) throws IOException {
         return campaignHandler.createNewCampaign(req, bindingResult, token);
+    }
+
+    @GetMapping(path = "/users/uuid/{user_uuid}/campaigns")
+    public GetCampaignsWithUserUUID.Response getCampaignsWithUserUUID(
+            @RequestHeader(value = "Authorization", required = false) String token, @PathVariable("user_uuid") String userUUID) {
+        return campaignHandler.getCampaignsWithUserUUID(token, userUUID);
     }
 }
