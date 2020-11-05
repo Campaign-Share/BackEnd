@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,18 +26,16 @@ public class Campaign extends BaseTimeEntity {
     @Size(min = 21, max = 21) @NotNull @NotEmpty @Pattern(regexp = "^campaign-\\d{12}")
     private String uuid;
 
-    @ManyToOne
-    @JoinColumn(name = "user_uuid", nullable = false, referencedColumnName = "uuid")
+    @Column(nullable = false, columnDefinition = "CHAR(17)", length = 17, name = "user_uuid")
     @Size(min = 17, max = 17) @NotNull @NotEmpty @Pattern(regexp = "^user-\\d{12}")
-    private UserAuth userAuth;
+    private String userUUID;
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "accepted")
-    private Boolean accepted;
+    private boolean accepted;
 
-    @ManyToOne
-    @JoinColumn(name = "accepter_uuid", referencedColumnName = "uuid")
+    @Column(columnDefinition = "CHAR(18)", length = 18, name = "accepter_uuid")
     @Size(min = 18, max = 18) @Pattern(regexp = "^admin-\\d{12}")
-    private AdminAuth adminAuth;
+    private String accepterUUID;
 
     @Column(nullable = false, length = 50, name = "title")
     @Size(max = 50) @NotNull
@@ -64,17 +63,14 @@ public class Campaign extends BaseTimeEntity {
     @Size(max = 100)
     private String postURI;
 
-    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
-    private Set<CampaignTag> campaignTags;
+    @OneToMany(mappedBy = "campaignUUID", cascade = CascadeType.ALL)
+    private List<CampaignTag> campaignTags;
 
     @Builder
     public Campaign(String uuid, String userUUID, String title, String subTitle, String introduction,
                     String participation, LocalDate startDate, LocalDate endDate, String postURI) {
-        this.userAuth = new UserAuth();
-        this.adminAuth = new AdminAuth();
-
         this.uuid = uuid;
-        this.userAuth.setUuid(userUUID);
+        this.userUUID = userUUID;
         this.title = title;
         this.subTitle = subTitle;
         this.introduction = introduction;
