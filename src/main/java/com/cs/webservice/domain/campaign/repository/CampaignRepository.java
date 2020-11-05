@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface CampaignRepository extends JpaRepository<Campaign, String> {
     List<Campaign> findAllByUserUUIDAndEndDateGreaterThanEqual(String userUUID, LocalDate date);
+    List<Campaign> findAllByUserUUID(String userUUID);
 
     default String getAvailableUUID() {
         while (true) {
