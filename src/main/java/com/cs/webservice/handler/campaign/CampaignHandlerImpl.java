@@ -81,7 +81,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                 .introduction(req.getIntroduction())
                 .participation(req.getParticipation())
                 .startDate(nowDate)
-                .endDate(nowDate.plusDays(req.getPeriodDay())).build();
+                .endDate(nowDate.plusDays(req.getPeriodDay() - 1)).build();
 
         if (req.getPoster() != null) {
             String postURI = "campaign/posters/" + campaignUUID;
@@ -99,7 +99,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             }
         }
 
-        resp.setStatus(HttpStatus.SC_OK);
+        resp.setStatus(HttpStatus.SC_CREATED);
         resp.setMessage("succeed to create new campaign");
         resp.setCampaignUUID(campaignUUID);
         return resp;
