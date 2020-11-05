@@ -30,7 +30,7 @@ public class CreateNewCampaign {
         @JsonProperty("participation")
         private String participation;
 
-        @Min(0) @Max(30) @NotNull
+        @Min(1) @Max(30) @NotNull
         @JsonProperty("period_day")
         private Integer periodDay;
 
