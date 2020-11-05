@@ -21,19 +21,17 @@ public class CampaignTag extends BaseTimeEntity {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "campaign_uuid",  referencedColumnName = "uuid", nullable = false)
+    @Column(nullable = false, columnDefinition = "CHAR(21)", length = 17, name = "campaign_uuid")
     @Size(min = 21, max = 21) @NotNull @NotEmpty @Pattern(regexp = "^campaign-\\d{12}")
-    private Campaign campaign;
+    private String campaignUUID;
 
     @Column(nullable = false, length = 20, name = "tag")
-    @Size(max = 10) @NotNull
+    @Size(max = 20) @NotNull
     private String tag;
 
     @Builder
     public CampaignTag(String campaignUUID, String tag) {
-        this.campaign = new Campaign();
-        this.campaign.setUuid(campaignUUID);
+        this.campaignUUID = campaignUUID;
         this.setTag(tag);
     }
 }
