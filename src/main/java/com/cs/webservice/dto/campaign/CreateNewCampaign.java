@@ -34,8 +34,8 @@ public class CreateNewCampaign {
         @JsonProperty("period_day")
         private Integer periodDay;
 
-        @JsonProperty("post")
-        private MultipartFile post;
+        @JsonProperty("poster")
+        private MultipartFile poster;
 
         @JsonProperty("tags")
         private String tags; // tag1|tag2|tag3 (개달 20글자 이하)
