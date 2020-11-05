@@ -288,7 +288,7 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         if (bindingResult.hasErrors()) {
             resp.setStatus(HttpStatus.SC_BAD_REQUEST);
             resp.setMessage(bindingResult.getAllErrors().toString());
-            System.out.println(bindingResult.getAllErrors().toString() + "qweqwe");
+            System.out.println(bindingResult.getAllErrors().toString());
             return resp;
         }
 
