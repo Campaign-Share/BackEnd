@@ -46,7 +46,13 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         }
 
         if (req.getTags() != null) {
-            for (String tag : req.getTags().split("\\|")) {
+            String[] tags = req.getTags().split("\\|");
+            if (tags.length > 5) {
+                resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+                resp.setMessage("the maximum number of tags is 5");
+                return resp;
+            }
+            for (String tag : tags) {
                 if (tag.length() > 20) {
                     resp.setStatus(HttpStatus.SC_BAD_REQUEST);
                     resp.setMessage(tag + " is over than 20 in tags");
@@ -66,7 +72,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return resp;
         }
 
-        System.out.println(authenticateResult.uuid);
         String campaignUUID = campaignRepository.getAvailableUUID();
         Campaign campaign = Campaign.builder()
                 .uuid(campaignUUID)
@@ -78,10 +83,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                 .startDate(nowDate)
                 .endDate(nowDate.plusDays(req.getPeriodDay())).build();
 
-        if (req.getPost() != null) {
-            String postURI = "campaign/posts/" + campaignUUID;
+        if (req.getPoster() != null) {
+            String postURI = "campaign/posters/" + campaignUUID;
             campaign.setPostURI(postURI);
-            s3Service.upload(req.getPost(), postURI);
+            s3Service.upload(req.getPoster(), postURI);
         }
 
         campaignRepository.save(campaign);
