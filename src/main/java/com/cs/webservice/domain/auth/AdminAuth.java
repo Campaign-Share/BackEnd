@@ -2,6 +2,7 @@ package com.cs.webservice.domain.auth;
 
 import com.cs.webservice.domain.BaseTimeEntity;
 import com.cs.webservice.domain.campaign.Campaign;
+import com.cs.webservice.domain.campaign.CampaignParticipation;
 import lombok.*;
 
 import javax.persistence.*;
@@ -39,6 +40,9 @@ public class AdminAuth extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "accepterUUID", cascade = CascadeType.ALL)
     private List<Campaign> campaigns;
+
+    @OneToMany(mappedBy = "accepterUUID", cascade = CascadeType.ALL)
+    private List<CampaignParticipation> campaignParticipations;
 
     @Builder
     public AdminAuth(String uuid, String userId, String userPW) {
