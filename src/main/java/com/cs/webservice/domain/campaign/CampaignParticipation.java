@@ -42,4 +42,12 @@ public class CampaignParticipation {
 
     @OneToMany(mappedBy = "participationUUID", cascade = CascadeType.ALL)
     private List<CampaignParticipationFile> campaignParticipationFiles;
+
+    @Builder
+    public CampaignParticipation(String uuid, String participantUUID, String campaignUUID, String information) {
+        this.uuid = uuid;
+        this.participantUUID = participantUUID;
+        this.campaignUUID = campaignUUID;
+        this.information = information;
+    }
 }
