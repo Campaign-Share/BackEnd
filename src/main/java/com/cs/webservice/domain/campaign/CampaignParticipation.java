@@ -2,14 +2,12 @@ package com.cs.webservice.domain.campaign;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -41,4 +39,7 @@ public class CampaignParticipation {
     @Column(columnDefinition = "CHAR(18)", length = 18, name = "accepter_uuid")
     @Size(min = 18, max = 18) @Pattern(regexp = "^admin-\\d{12}")
     private String accepterUUID;
+
+    @OneToMany(mappedBy = "participationUUID", cascade = CascadeType.ALL)
+    private List<CampaignParticipationFile> campaignParticipationFiles;
 }
