@@ -31,4 +31,10 @@ public class CampaignParticipationFile {
     @Column(nullable = false, length = 100, name = "file_uri")
     @Size(max = 100) @NotNull
     private String fileURI;
+
+    @Builder
+    public CampaignParticipationFile(String participationUUID, String fileURI) {
+        this.participationUUID = participationUUID;
+        this.fileURI = fileURI;
+    }
 }
