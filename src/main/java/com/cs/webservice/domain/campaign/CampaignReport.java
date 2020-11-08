@@ -38,4 +38,13 @@ public class CampaignReport {
     @Column(nullable = false, length = 50, name = "reason")
     @Size(max = 50) @NotNull
     private String reason;
+
+    @Builder
+    public CampaignReport(String uuid, String reporterUUID, String targetUUID, String field, String reason) {
+        this.uuid = uuid;
+        this.reporterUUID = reporterUUID;
+        this.targetUUID = targetUUID;
+        this.field = field;
+        this.reason = reason;
+    }
 }
