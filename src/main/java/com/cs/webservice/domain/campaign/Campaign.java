@@ -66,6 +66,15 @@ public class Campaign extends BaseTimeEntity {
     @OneToMany(mappedBy = "campaignUUID", cascade = CascadeType.ALL)
     private List<CampaignTag> campaignTags;
 
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "agree_number")
+    private int agreeNumber;
+
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "disagree_number")
+    private int disagreeNumber;
+
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "participation_number")
+    private int participationNumber;
+
     @Builder
     public Campaign(String uuid, String userUUID, String title, String subTitle, String introduction,
                     String participation, LocalDate startDate, LocalDate endDate, String postURI) {
