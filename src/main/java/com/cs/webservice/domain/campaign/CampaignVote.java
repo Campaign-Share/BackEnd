@@ -35,4 +35,11 @@ public class CampaignVote {
 
     @Column(nullable = false, name = "agree")
     private boolean agree;
+
+    @Builder
+    public CampaignVote(String voterUUID, String campaignUUID, boolean agree) {
+        this.voterUUID = voterUUID;
+        this.campaignUUID = campaignUUID;
+        this.agree = agree;
+    }
 }
