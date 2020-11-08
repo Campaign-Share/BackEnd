@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,12 @@ public class UserAuth extends BaseTimeEntity {
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "locked")
     private boolean locked;
+
+    @Column(name = "lock_period")
+    private LocalDate lockPeriod;
+
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "lock_number")
+    private int lockNumber;
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "have_used")
     private boolean haveUsed;
