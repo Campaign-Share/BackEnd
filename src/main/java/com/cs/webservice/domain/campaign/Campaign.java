@@ -30,8 +30,8 @@ public class Campaign extends BaseTimeEntity {
     @Size(min = 17, max = 17) @NotNull @NotEmpty @Pattern(regexp = "^user-\\d{12}")
     private String userUUID;
 
-    @Column(name = "accepted")
-    private boolean accepted;
+    @Column(name = "accepted", columnDefinition = "TINYINT(1) DEFAULT 0")
+    private int accepted;
 
     @Column(columnDefinition = "CHAR(18)", length = 18, name = "accepter_uuid")
     @Size(min = 18, max = 18) @Pattern(regexp = "^admin-\\d{12}")
