@@ -30,7 +30,7 @@ public class Campaign extends BaseTimeEntity {
     @Size(min = 17, max = 17) @NotNull @NotEmpty @Pattern(regexp = "^user-\\d{12}")
     private String userUUID;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "accepted")
+    @Column(name = "accepted")
     private boolean accepted;
 
     @Column(columnDefinition = "CHAR(18)", length = 18, name = "accepter_uuid")
