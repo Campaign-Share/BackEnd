@@ -72,6 +72,9 @@ public class Campaign extends BaseTimeEntity {
     @OneToMany(mappedBy = "targetUUID", cascade = CascadeType.ALL)
     private List<CampaignReport> campaignReports;
 
+    @OneToMany(mappedBy = "campaignUUID", cascade = CascadeType.ALL)
+    private List<CampaignVote> campaignVotes;
+
     @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "agree_number")
     private int agreeNumber;
 
