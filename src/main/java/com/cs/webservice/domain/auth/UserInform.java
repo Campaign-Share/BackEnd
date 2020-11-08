@@ -37,6 +37,15 @@ public class UserInform extends BaseTimeEntity {
     @Size(max = 100)
     private String profileURI;
 
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "approved_number")
+    private int approvedNumber;
+
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "rejected_number")
+    private int rejectedNumber;
+
+    @Column(nullable = false, columnDefinition = "INT(11) DEFAULT 0", name = "participation_number")
+    private int participationNumber;
+
     @Builder
     public UserInform(String name, String nickName, String email) {
         this.userAuth = new UserAuth();
