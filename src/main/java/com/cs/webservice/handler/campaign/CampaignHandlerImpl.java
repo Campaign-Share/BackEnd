@@ -5,12 +5,14 @@ import com.cs.webservice.domain.campaign.CampaignTag;
 import com.cs.webservice.domain.campaign.repository.CampaignRepository;
 import com.cs.webservice.domain.campaign.repository.CampaignTagRepository;
 import com.cs.webservice.dto.campaign.CreateNewCampaign;
+import com.cs.webservice.dto.campaign.GetCampaignsSortedByCreate;
 import com.cs.webservice.dto.campaign.GetCampaignsWithUserUUID;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.JwtTokenProvider;
 import com.cs.webservice.utils.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpStatus;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -30,35 +32,35 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
     private final S3Service s3Service;
 
-    public CreateNewCampaign.Response createNewCampaign(CreateNewCampaign.Request req, BindingResult bindingResult, String token) throws IOException {
+    public ResponseEntity<CreateNewCampaign.Response> createNewCampaign(CreateNewCampaign.Request req, BindingResult bindingResult, String token) throws IOException {
         var resp = new CreateNewCampaign.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
         if (!authenticateResult.authorized) {
-            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
             resp.setCode(authenticateResult.code);
             resp.setMessage(authenticateResult.message);
-            return resp;
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
         }
 
         if (bindingResult.hasErrors()) {
-            resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
             resp.setMessage(bindingResult.getAllErrors().toString());
-            return resp;
+            return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
         }
 
         if (req.getTags() != null) {
             String[] tags = req.getTags().split("\\|");
             if (tags.length > 5) {
-                resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+                resp.setStatus(HttpStatus.BAD_REQUEST.value());
                 resp.setMessage("the maximum number of tags is 5");
-                return resp;
+                return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
             }
             for (String tag : tags) {
                 if (tag.length() > 20) {
-                    resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+                    resp.setStatus(HttpStatus.BAD_REQUEST.value());
                     resp.setMessage(tag + " is over than 20 in tags");
-                    return resp;
+                    return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
                 }
             }
         }
@@ -68,10 +70,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         LocalDate nowDate = LocalDate.now();
         List<Campaign> currentCampaigns = campaignRepository.findAllByUserUUIDAndEndDateGreaterThanEqual(authenticateResult.uuid, nowDate);
         if (currentCampaigns.size() >= 3) {
-            resp.setStatus(HttpStatus.SC_CONFLICT);
+            resp.setStatus(HttpStatus.CONFLICT.value());
             resp.setCode(-1061);
             resp.setMessage("you have exceeded the number of registered campaigns");
-            return resp;
+            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
         }
 
         String campaignUUID = campaignRepository.getAvailableUUID();
@@ -101,27 +103,27 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             }
         }
 
-        resp.setStatus(HttpStatus.SC_CREATED);
+        resp.setStatus(HttpStatus.CREATED.value());
         resp.setMessage("succeed to create new campaign");
         resp.setCampaignUUID(campaignUUID);
-        return resp;
+        return new ResponseEntity<>(resp, HttpStatus.CREATED);
     }
 
-    public GetCampaignsWithUserUUID.Response getCampaignsWithUserUUID(String token, String userUUID) {
+    public ResponseEntity<GetCampaignsWithUserUUID.Response> getCampaignsWithUserUUID(String token, String userUUID) {
         var resp = new GetCampaignsWithUserUUID.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
         if (!authenticateResult.authorized) {
-            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
             resp.setCode(authenticateResult.code);
             resp.setMessage(authenticateResult.message);
-            return resp;
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
         }
 
         if (!authenticateResult.uuid.equals(userUUID)) {
-            resp.setStatus(HttpStatus.SC_FORBIDDEN);
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
             resp.setMessage("uuid in request uri is not your uuid");
-            return resp;
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
         }
 
         List<GetCampaignsWithUserUUID.Campaign> campaigns = new ArrayList<>();
@@ -146,8 +148,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     campaigns.add(respCampaigns);
                 });
 
-        resp.setStatus(HttpStatus.SC_OK);
+        resp.setStatus(HttpStatus.OK.value());
         resp.setCampaigns(campaigns);
-        return resp;
+        return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
