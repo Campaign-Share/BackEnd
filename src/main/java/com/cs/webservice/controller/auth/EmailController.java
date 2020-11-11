@@ -7,6 +7,7 @@ import com.cs.webservice.handler.auth.EmailHandlerImpl;
 import com.cs.webservice.utils.Random;
 import lombok.AllArgsConstructor;
 import org.apache.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,12 +22,12 @@ public class EmailController {
     private final EmailHandlerImpl emailHandler;
 
     @PostMapping(value = "/v1/email/verify", consumes = {"application/json"})
-    public SendEmail.Response sendEmail(@Valid @RequestBody SendEmail.Request req, BindingResult bindingResult) {
+    public ResponseEntity<SendEmail.Response> sendEmail(@Valid @RequestBody SendEmail.Request req, BindingResult bindingResult) {
         return emailHandler.sendEmail(req, bindingResult);
     }
 
     @PutMapping(value = "/v1/email/verify", consumes = {"application/json"})
-    public VerifyEmail.Response verifyEmail(@Valid @RequestBody VerifyEmail.Request req, BindingResult bindingResult) {
+    public ResponseEntity<VerifyEmail.Response> verifyEmail(@Valid @RequestBody VerifyEmail.Request req, BindingResult bindingResult) {
         return emailHandler.verifyEmail(req, bindingResult);
     }
 }
