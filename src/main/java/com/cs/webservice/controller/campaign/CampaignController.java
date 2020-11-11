@@ -2,6 +2,7 @@ package com.cs.webservice.controller.campaign;
 
 import com.cs.webservice.dto.campaign.CreateNewCampaign;
 import com.cs.webservice.dto.campaign.GetCampaignsSortedByCreate;
+import com.cs.webservice.dto.campaign.GetCampaignsSortedByFamous;
 import com.cs.webservice.dto.campaign.GetCampaignsWithUserUUID;
 import com.cs.webservice.handler.campaign.CampaignHandlerImpl;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +37,13 @@ public class CampaignController {
             @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
             @RequestParam(value = "status", required = false) String statusFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
         return campaignHandler.getCampaignsSortedByCreate(token, startPaging, countPaging, statusFilter, tagFilter);
+    }
+
+    @GetMapping(path = "/campaigns/sorted-by/famous")
+    public ResponseEntity<GetCampaignsSortedByFamous.Response> getCampaignsSortedByFamous(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
+            @RequestParam(value = "status", required = false) String statusFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+        return campaignHandler.getCampaignsSortedByFamous(token, startPaging, countPaging, statusFilter, tagFilter);
     }
 }
