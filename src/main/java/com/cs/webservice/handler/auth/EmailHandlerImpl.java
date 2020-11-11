@@ -115,10 +115,5 @@ public class EmailHandlerImpl implements EmailHandler {
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("succeed to certify email");
         return new ResponseEntity<>(resp, HttpStatus.OK);
-
-        // 존재 X -> -1011
-        // 이미 인증 됨 -> -1012
-        // 인증 코드 다름 -> -1013
-        // 인증 완료
     }
 }

@@ -43,11 +43,6 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
         }
 
-        // 인증되지 않은 email임 -> -1021
-        // 이미 사용중인 email임 -> -1022
-        // user id 중복 -> -1023
-        // email 중복 -> -1024
-
         Optional<EmailCertify> selectResult = emailCertifyRepository.findByEmailAndCertified(req.getEmail(), true);
         if (selectResult.isEmpty()) {
             resp.setStatus(HttpStatus.CONFLICT.value());
@@ -119,9 +114,6 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
         }
 
-        // 아이디 없음 -> -1031
-        // 비밀번호 오류 -> -1032
-
         Optional<UserAuth> selectResult = userAuthRepository.findByUserID(req.getUserID());
         if (selectResult.isEmpty()) {
             resp.setStatus(HttpStatus.CONFLICT.value());
@@ -175,8 +167,6 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             resp.setMessage("not exist user uuid");
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
-
-        // 현재 비밀번호 일치 X -> -1041
 
         UserAuth userAuth = selectResult.get();
         if (!BCrypt.checkpw(req.getCurrentPW(), userAuth.getUserPW())) {
@@ -306,10 +296,6 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             resp.setMessage("not exist user uuid");
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
-
-        // 인증되지 않은 email임 -> -1051
-        // 이미 사용중인 email임 -> -1052
-        // email 중복 -> -1053
 
         if (req.getEmail() != null) {
             Optional<EmailCertify> selectEmail = emailCertifyRepository.findByEmailAndCertified(req.getEmail(), true);

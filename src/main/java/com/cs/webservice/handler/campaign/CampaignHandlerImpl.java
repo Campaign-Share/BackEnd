@@ -65,8 +65,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             }
         }
 
-        // 캠페인 등록 가능 숫자(3) 이상 -> -1061
-
         LocalDate nowDate = LocalDate.now();
         List<Campaign> currentCampaigns = campaignRepository.findAllByUserUUIDAndEndDateGreaterThanEqual(authenticateResult.uuid, nowDate);
         if (currentCampaigns.size() >= 3) {
@@ -152,4 +150,4 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setCampaigns(campaigns);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
-}
+    }
