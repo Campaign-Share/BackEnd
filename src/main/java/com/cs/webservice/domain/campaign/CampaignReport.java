@@ -12,7 +12,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
 @Setter
 @Entity(name = "campaign_reports")
