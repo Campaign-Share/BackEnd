@@ -152,7 +152,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
     public ResponseEntity<GetCampaignsSortedByCreate.Response> getCampaignsSortedByCreate(String token, Integer startPaging, Integer countPaging,
                                                                                    String statusStrFilter, String tagFilter) {
-
         var resp = new GetCampaignsSortedByCreate.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -237,8 +236,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
     public ResponseEntity<GetCampaignsSortedByFamous.Response> getCampaignsSortedByFamous(String token, Integer startPaging, Integer countPaging,
                                                                                           String statusStrFilter, String tagFilter) {
-
-
         var resp = new GetCampaignsSortedByFamous.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -316,6 +313,90 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("succeed to get campaigns sorted by agree & disagree number");
+        resp.setCampaigns(campaignsForResp);
+
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    public ResponseEntity<GetCampaignsSortedByRandom.Response> getCampaignsSortedByRandom(String token, Integer startPaging, Integer countPaging,
+                                                                                   String statusStrFilter, String tagFilter) {
+        var resp = new GetCampaignsSortedByRandom.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (startPaging == null) {
+            startPaging = 0;
+        }
+        if (countPaging == null) {
+            countPaging = 10;
+        }
+
+        Integer statusFilter = null;
+        if (statusStrFilter != null) {
+            switch (statusStrFilter) {
+                case "pending":
+                    statusFilter = CampaignStatus.PENDING;
+                    break;
+                case "approved":
+                    statusFilter = CampaignStatus.APPROVED;
+                    break;
+                case "rejected":
+                    statusFilter = CampaignStatus.REJECTED;
+                    break;
+            }
+        }
+
+        List<Campaign> campaigns;
+        if (statusFilter != null && tagFilter != null) {
+            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByRandom(tagFilter, statusFilter, startPaging, countPaging);
+        } else if (statusFilter != null) {
+            campaigns = campaignRepository.findAllByStatusWithPagingSortedByRandom(statusFilter, startPaging, countPaging);
+        } else if (tagFilter != null) {
+            campaigns = campaignRepository.findAllByTagWithPagingSortedByRandom(tagFilter, startPaging, countPaging);
+        } else {
+            campaigns = campaignRepository.findAllWithPagingSortedByRandom(startPaging, countPaging);
+        }
+
+        List<CampaignDTO> campaignsForResp = new ArrayList<>();
+        campaigns.forEach(campaign -> {
+            CampaignDTO respCampaigns = CampaignDTO.builder()
+                    .campaignUUID(campaign.getUuid())
+                    .userUUID(campaign.getUserUUID())
+                    .title(campaign.getTitle())
+                    .subTitle(campaign.getSubTitle())
+                    .introduction(campaign.getIntroduction())
+                    .participation(campaign.getParticipation())
+                    .startDate(campaign.getStartDate())
+                    .endDate(campaign.getEndDate())
+                    .postURI(campaign.getPostURI()).build();
+            switch (campaign.getStatus()) {
+                case CampaignStatus.PENDING:
+                    respCampaigns.setStatus("pending");
+                    break;
+                case CampaignStatus.APPROVED:
+                    respCampaigns.setStatus("approved");
+                    break;
+                case CampaignStatus.REJECTED:
+                    respCampaigns.setStatus("rejected");
+                    break;
+            }
+
+            List<String> respCampaignTags = new ArrayList<>();
+            campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
+                    .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
+
+            respCampaigns.setCampaignTags(respCampaignTags);
+            campaignsForResp.add(respCampaigns);
+        });
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get campaigns sorted by random");
         resp.setCampaigns(campaignsForResp);
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
