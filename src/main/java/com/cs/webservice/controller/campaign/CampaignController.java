@@ -26,31 +26,31 @@ public class CampaignController {
     public ResponseEntity<GetCampaignsWithUserUUID.Response> getCampaignsWithUserUUID(
             @RequestHeader(value = "Authorization", required = false) String token, @PathVariable("user_uuid") String userUUID,
             @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "status", required = false) String statusFilter) {
-        return campaignHandler.getCampaignsWithUserUUID(token, userUUID, startPaging, countPaging, statusFilter);
+            @RequestParam(value = "state", required = false) String stateFilter) {
+        return campaignHandler.getCampaignsWithUserUUID(token, userUUID, startPaging, countPaging, stateFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/create-time")
     public ResponseEntity<GetCampaignsSortedByCreate.Response> getCampaignsSortedByCreate(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "status", required = false) String statusFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
-        return campaignHandler.getCampaignsSortedByCreate(token, startPaging, countPaging, statusFilter, tagFilter);
+            @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+        return campaignHandler.getCampaignsSortedByCreate(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/famous")
     public ResponseEntity<GetCampaignsSortedByFamous.Response> getCampaignsSortedByFamous(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "status", required = false) String statusFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
-        return campaignHandler.getCampaignsSortedByFamous(token, startPaging, countPaging, statusFilter, tagFilter);
+            @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+        return campaignHandler.getCampaignsSortedByFamous(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/random")
     public ResponseEntity<GetCampaignsSortedByRandom.Response> getCampaignsSortedByRandom(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "status", required = false) String statusFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
-        return campaignHandler.getCampaignsSortedByRandom(token, startPaging, countPaging, statusFilter, tagFilter);
+            @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+        return campaignHandler.getCampaignsSortedByRandom(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 }
