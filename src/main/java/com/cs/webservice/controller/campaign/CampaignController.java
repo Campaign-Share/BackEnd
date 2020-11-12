@@ -24,8 +24,10 @@ public class CampaignController {
 
     @GetMapping(path = "/users/uuid/{user_uuid}/campaigns")
     public ResponseEntity<GetCampaignsWithUserUUID.Response> getCampaignsWithUserUUID(
-            @RequestHeader(value = "Authorization", required = false) String token, @PathVariable("user_uuid") String userUUID) {
-        return campaignHandler.getCampaignsWithUserUUID(token, userUUID);
+            @RequestHeader(value = "Authorization", required = false) String token, @PathVariable("user_uuid") String userUUID,
+            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
+            @RequestParam(value = "status", required = false) String statusFilter) {
+        return campaignHandler.getCampaignsWithUserUUID(token, userUUID, startPaging, countPaging, statusFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/create-time")
