@@ -1,8 +1,10 @@
 package com.cs.webservice.handler.auth;
 
+import com.cs.webservice.domain.auth.AdminAuth;
 import com.cs.webservice.domain.auth.EmailCertify;
 import com.cs.webservice.domain.auth.UserAuth;
 import com.cs.webservice.domain.auth.UserInform;
+import com.cs.webservice.domain.auth.repository.AdminAuthRepository;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
@@ -25,6 +27,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
     private final UserAuthRepository userAuthRepository;
+
+    private final AdminAuthRepository adminAuthRepository;
 
     private final UserInformRepository userInformRepository;
 
@@ -359,6 +363,41 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("Succeed to change user inform");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<LoginAdminAuth.Response> loginAdminAuth(LoginAdminAuth.Request req, BindingResult bindingResult) {
+        var resp = new LoginAdminAuth.Response();
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+        }
+
+        // -1071 -> 존재하지 않는 admin id
+        // -1072 -> 올바르지 않은 admin pw
+
+        Optional<AdminAuth> selectResult = adminAuthRepository.findByAdminID(req.getAdminID());
+        if (selectResult.isEmpty()) {
+            resp.setStatus(HttpStatus.CONFLICT.value());
+            resp.setCode(-1071);
+            resp.setMessage("not exist admin id");
+            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+        }
+
+        AdminAuth adminAuth = selectResult.get();
+        if (!BCrypt.checkpw(req.getAdminPW(), adminAuth.getAdminPW())) {
+            resp.setStatus(HttpStatus.CONFLICT.value());
+            resp.setCode(-1072);
+            resp.setMessage("incorrect admin password");
+            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+        }
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setAccessToken(jwtTokenProvider.generateAccessToken(adminAuth.getUuid()));
+        resp.setUserUUID(adminAuth.getUuid());
+        resp.setMessage("succeed to login admin auth");
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
