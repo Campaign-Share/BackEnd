@@ -17,11 +17,11 @@ public class LoginAdminAuth {
         @NotNull
         @NotEmpty
         @JsonProperty("admin_id")
-        private String userID;
+        private String adminID;
 
         @NotNull @NotEmpty
         @JsonProperty("admin_pw")
-        private String userPW;
+        private String adminPW;
     }
 
     @Setter
