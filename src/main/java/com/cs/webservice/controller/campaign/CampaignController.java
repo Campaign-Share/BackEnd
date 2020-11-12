@@ -53,4 +53,10 @@ public class CampaignController {
             @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
         return campaignHandler.getCampaignsSortedByRandom(token, startPaging, countPaging, stateFilter, tagFilter);
     }
+
+    @GetMapping(path = "/campaigns/{campaign_uuid}")
+    public ResponseEntity<GetCampaignWithUUID.Response> getCampaignWithUUID(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                            @PathVariable("campaign_uuid") String campaignUUID) {
+        return campaignHandler.getCampaignWithUUID(token, campaignUUID);
+    }
 }
