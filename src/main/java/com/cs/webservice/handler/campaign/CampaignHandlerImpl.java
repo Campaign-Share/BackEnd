@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -107,7 +108,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     }
 
     public ResponseEntity<GetCampaignsWithUserUUID.Response> getCampaignsWithUserUUID(String token, String userUUID,
-                                                                               Integer startPaging, Integer countPaging, String statusStrFilter)  {
+                                                                               Integer startPaging, Integer countPaging, String stateStrFilter)  {
         var resp = new GetCampaignsWithUserUUID.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -131,24 +132,24 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             countPaging = 10;
         }
 
-        Integer statusFilter = null;
-        if (statusStrFilter != null) {
-            switch (statusStrFilter) {
+        Integer stateFilter = null;
+        if (stateStrFilter != null) {
+            switch (stateStrFilter) {
                 case "pending":
-                    statusFilter = CampaignStatus.PENDING;
+                    stateFilter = CampaignStatus.PENDING;
                     break;
                 case "approved":
-                    statusFilter = CampaignStatus.APPROVED;
+                    stateFilter = CampaignStatus.APPROVED;
                     break;
                 case "rejected":
-                    statusFilter = CampaignStatus.REJECTED;
+                    stateFilter = CampaignStatus.REJECTED;
                     break;
             }
         }
 
         List<Campaign> campaigns;
-        if (statusFilter != null) {
-            campaigns = campaignRepository.findAllByUserUUIDAndStatusWithPagingSortedByCreatedAt(userUUID, statusFilter, startPaging, countPaging);
+        if (stateFilter != null) {
+            campaigns = campaignRepository.findAllByUserUUIDAndStatusWithPagingSortedByCreatedAt(userUUID, stateFilter, startPaging, countPaging);
         } else {
             campaigns = campaignRepository.findAllByUserUUIDWithPagingSortedByCreatedAt(userUUID, startPaging, countPaging);
         }
@@ -167,13 +168,13 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .postURI(campaign.getPostURI()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
-                    respCampaigns.setStatus("pending");
+                    respCampaigns.setState("pending");
                     break;
                 case CampaignStatus.APPROVED:
-                    respCampaigns.setStatus("approved");
+                    respCampaigns.setState("approved");
                     break;
                 case CampaignStatus.REJECTED:
-                    respCampaigns.setStatus("rejected");
+                    respCampaigns.setState("rejected");
                     break;
             }
 
@@ -193,7 +194,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     }
 
     public ResponseEntity<GetCampaignsSortedByCreate.Response> getCampaignsSortedByCreate(String token, Integer startPaging, Integer countPaging,
-                                                                                   String statusStrFilter, String tagFilter) {
+                                                                                   String stateStrFilter, String tagFilter) {
         var resp = new GetCampaignsSortedByCreate.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -211,26 +212,26 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             countPaging = 10;
         }
 
-        Integer statusFilter = null;
-        if (statusStrFilter != null) {
-            switch (statusStrFilter) {
+        Integer stateFilter = null;
+        if (stateStrFilter != null) {
+            switch (stateStrFilter) {
             case "pending":
-                statusFilter = CampaignStatus.PENDING;
+                stateFilter = CampaignStatus.PENDING;
                 break;
             case "approved":
-                statusFilter = CampaignStatus.APPROVED;
+                stateFilter = CampaignStatus.APPROVED;
                 break;
             case "rejected":
-                statusFilter = CampaignStatus.REJECTED;
+                stateFilter = CampaignStatus.REJECTED;
                 break;
             }
         }
 
         List<Campaign> campaigns;
-        if (statusFilter != null && tagFilter != null) {
-            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByCreatedAt(tagFilter, statusFilter, startPaging, countPaging);
-        } else if (statusFilter != null) {
-            campaigns = campaignRepository.findAllByStatusWithPagingSortedByCreatedAt(statusFilter, startPaging, countPaging);
+        if (stateFilter != null && tagFilter != null) {
+            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByCreatedAt(tagFilter, stateFilter, startPaging, countPaging);
+        } else if (stateFilter != null) {
+            campaigns = campaignRepository.findAllByStatusWithPagingSortedByCreatedAt(stateFilter, startPaging, countPaging);
         } else if (tagFilter != null) {
             campaigns = campaignRepository.findAllByTagWithPagingSortedByCreatedAt(tagFilter, startPaging, countPaging);
         } else {
@@ -251,13 +252,13 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .postURI(campaign.getPostURI()).build();
             switch (campaign.getStatus()) {
             case CampaignStatus.PENDING:
-                respCampaigns.setStatus("pending");
+                respCampaigns.setState("pending");
                 break;
             case CampaignStatus.APPROVED:
-                respCampaigns.setStatus("approved");
+                respCampaigns.setState("approved");
                 break;
             case CampaignStatus.REJECTED:
-                respCampaigns.setStatus("rejected");
+                respCampaigns.setState("rejected");
                 break;
             }
 
@@ -277,7 +278,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     }
 
     public ResponseEntity<GetCampaignsSortedByFamous.Response> getCampaignsSortedByFamous(String token, Integer startPaging, Integer countPaging,
-                                                                                          String statusStrFilter, String tagFilter) {
+                                                                                          String stateStrFilter, String tagFilter) {
         var resp = new GetCampaignsSortedByFamous.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -295,26 +296,26 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             countPaging = 10;
         }
 
-        Integer statusFilter = null;
-        if (statusStrFilter != null) {
-            switch (statusStrFilter) {
+        Integer stateFilter = null;
+        if (stateStrFilter != null) {
+            switch (stateStrFilter) {
                 case "pending":
-                    statusFilter = CampaignStatus.PENDING;
+                    stateFilter = CampaignStatus.PENDING;
                     break;
                 case "approved":
-                    statusFilter = CampaignStatus.APPROVED;
+                    stateFilter = CampaignStatus.APPROVED;
                     break;
                 case "rejected":
-                    statusFilter = CampaignStatus.REJECTED;
+                    stateFilter = CampaignStatus.REJECTED;
                     break;
             }
         }
 
         List<Campaign> campaigns;
-        if (statusFilter != null && tagFilter != null) {
-            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByFamous(tagFilter, statusFilter, startPaging, countPaging);
-        } else if (statusFilter != null) {
-            campaigns = campaignRepository.findAllByStatusWithPagingSortedByFamous(statusFilter, startPaging, countPaging);
+        if (stateFilter != null && tagFilter != null) {
+            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByFamous(tagFilter, stateFilter, startPaging, countPaging);
+        } else if (stateFilter != null) {
+            campaigns = campaignRepository.findAllByStatusWithPagingSortedByFamous(stateFilter, startPaging, countPaging);
         } else if (tagFilter != null) {
             campaigns = campaignRepository.findAllByTagWithPagingSortedByFamous(tagFilter, startPaging, countPaging);
         } else {
@@ -335,13 +336,13 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .postURI(campaign.getPostURI()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
-                    respCampaigns.setStatus("pending");
+                    respCampaigns.setState("pending");
                     break;
                 case CampaignStatus.APPROVED:
-                    respCampaigns.setStatus("approved");
+                    respCampaigns.setState("approved");
                     break;
                 case CampaignStatus.REJECTED:
-                    respCampaigns.setStatus("rejected");
+                    respCampaigns.setState("rejected");
                     break;
             }
 
@@ -361,7 +362,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     }
 
     public ResponseEntity<GetCampaignsSortedByRandom.Response> getCampaignsSortedByRandom(String token, Integer startPaging, Integer countPaging,
-                                                                                   String statusStrFilter, String tagFilter) {
+                                                                                   String stateStrFilter, String tagFilter) {
         var resp = new GetCampaignsSortedByRandom.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -379,26 +380,26 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             countPaging = 10;
         }
 
-        Integer statusFilter = null;
-        if (statusStrFilter != null) {
-            switch (statusStrFilter) {
+        Integer stateFilter = null;
+        if (stateStrFilter != null) {
+            switch (stateStrFilter) {
                 case "pending":
-                    statusFilter = CampaignStatus.PENDING;
+                    stateFilter = CampaignStatus.PENDING;
                     break;
                 case "approved":
-                    statusFilter = CampaignStatus.APPROVED;
+                    stateFilter = CampaignStatus.APPROVED;
                     break;
                 case "rejected":
-                    statusFilter = CampaignStatus.REJECTED;
+                    stateFilter = CampaignStatus.REJECTED;
                     break;
             }
         }
 
         List<Campaign> campaigns;
-        if (statusFilter != null && tagFilter != null) {
-            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByRandom(tagFilter, statusFilter, startPaging, countPaging);
-        } else if (statusFilter != null) {
-            campaigns = campaignRepository.findAllByStatusWithPagingSortedByRandom(statusFilter, startPaging, countPaging);
+        if (stateFilter != null && tagFilter != null) {
+            campaigns = campaignRepository.findAllByTagAndStatusWithPagingSortedByRandom(tagFilter, stateFilter, startPaging, countPaging);
+        } else if (stateFilter != null) {
+            campaigns = campaignRepository.findAllByStatusWithPagingSortedByRandom(stateFilter, startPaging, countPaging);
         } else if (tagFilter != null) {
             campaigns = campaignRepository.findAllByTagWithPagingSortedByRandom(tagFilter, startPaging, countPaging);
         } else {
@@ -419,13 +420,13 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .postURI(campaign.getPostURI()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
-                    respCampaigns.setStatus("pending");
+                    respCampaigns.setState("pending");
                     break;
                 case CampaignStatus.APPROVED:
-                    respCampaigns.setStatus("approved");
+                    respCampaigns.setState("approved");
                     break;
                 case CampaignStatus.REJECTED:
-                    respCampaigns.setStatus("rejected");
+                    respCampaigns.setState("rejected");
                     break;
             }
 
