@@ -16,8 +16,8 @@ public final class CampaignDTO {
     @JsonProperty("user_uuid")
     private String userUUID;
 
-    @JsonProperty("status")
-    private String status;
+    @JsonProperty("state")
+    private String state;
 
     @JsonProperty("title")
     private String title;
