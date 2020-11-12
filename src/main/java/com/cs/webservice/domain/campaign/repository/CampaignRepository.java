@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface CampaignRepository extends JpaRepository<Campaign, String> {
     List<Campaign> findAllByUserUUIDAndEndDateGreaterThanEqual(String userUUID, LocalDate date);
-    List<Campaign> findAllByUserUUID(String userUUID);
+    Optional<Campaign> findByUuid(String campaignUUID);
 
     @Query(value = "SELECT * FROM campaigns WHERE uuid IN (SELECT DISTINCT campaign_uuid FROM campaign_tags WHERE tag=?1) " +
             "AND status=?2 AND CURRENT_DATE() <= CAST(end_date AS DATETIME) ORDER BY created_at DESC LIMIT ?4 OFFSET ?3", nativeQuery = true)
