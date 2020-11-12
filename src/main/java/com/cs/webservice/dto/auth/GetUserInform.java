@@ -2,25 +2,10 @@ package com.cs.webservice.dto.auth;
 
 import com.cs.webservice.dto.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.br.CNPJ;
 
 public class GetUserInform {
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class CampaignNumber {
-        @JsonProperty("accept")
-        private int accept;
-
-        @JsonProperty("reject")
-        private int reject;
-
-        @JsonProperty("participate")
-        private int participate;
-    }
-
     @Setter
     @NoArgsConstructor
     public static class Response extends BaseResponse {
@@ -43,6 +28,6 @@ public class GetUserInform {
         private String profileURI;
 
         @JsonProperty("campaign_number")
-        private CampaignNumber campaignNumber;
+        private UserInformDTO.CampaignNumber campaignNumber;
     }
 }
