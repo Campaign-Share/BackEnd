@@ -48,6 +48,11 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     @Query(value = "SELECT * FROM campaigns WHERE CURRENT_DATE() <= CAST(end_date AS DATETIME) ORDER BY RAND() DESC LIMIT ?2 OFFSET ?1", nativeQuery = true)
     List<Campaign> findAllWithPagingSortedByRandom(Integer start, Integer count);
 
+    @Query(value = "SELECT * FROM campaigns WHERE user_uuid = ?1 ORDER BY created_at DESC LIMIT ?3 OFFSET ?2", nativeQuery = true)
+    List<Campaign> findAllByUserUUIDWithPagingSortedByCreatedAt(String userUUID, Integer start, Integer count);
+    @Query(value = "SELECT * FROM campaigns WHERE user_uuid = ?1 AND status=?2 ORDER BY created_at DESC LIMIT ?4 OFFSET ?3", nativeQuery = true)
+    List<Campaign> findAllByUserUUIDAndStatusWithPagingSortedByCreatedAt(String userUUID, Integer status, Integer start, Integer count);
+
     default String getAvailableUUID() {
         while (true) {
             String campaignUUID = "campaign-" + Random.generateNumberString(12);
