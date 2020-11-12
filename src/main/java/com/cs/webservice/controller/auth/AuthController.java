@@ -51,4 +51,9 @@ public class AuthController {
                                                       @PathVariable("user_uuid") String userUUID) throws IOException {
         return authHandler.changeUserInform(req, bindingResult, token, userUUID);
     }
+
+    @PostMapping(path = "/login/admin", consumes = {"application/json"})
+    public ResponseEntity<LoginAdminAuth.Response> loginAdminAuth(@Valid @RequestBody LoginAdminAuth.Request req, BindingResult bindingResult) {
+        return authHandler.loginAdminAuth(req, bindingResult);
+    }
 }
