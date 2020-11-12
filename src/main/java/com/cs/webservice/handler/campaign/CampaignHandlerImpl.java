@@ -493,4 +493,60 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    public ResponseEntity<GetCampaignsWithUUIDs.Response> getCampaignsWithUUIDs(GetCampaignsWithUUIDs.Request req, BindingResult bindingResult, String token) {
+        var resp = new GetCampaignsWithUUIDs.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        List<CampaignDTO> campaignsForResp = new ArrayList<>();
+        for (String campaignUUID: req.getCampaignUUIDs()) {
+            Optional<Campaign> selectResult = campaignRepository.findByUuid(campaignUUID);
+            if (selectResult.isEmpty()) {
+                resp.setStatus(HttpStatus.NOT_FOUND.value());
+                resp.setMessage("campaign uuid list contain not exist campaign");
+                return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+            }
+
+            Campaign campaign = selectResult.get();
+            CampaignDTO respCampaigns = CampaignDTO.builder()
+                    .campaignUUID(campaign.getUuid())
+                    .userUUID(campaign.getUserUUID())
+                    .title(campaign.getTitle())
+                    .subTitle(campaign.getSubTitle())
+                    .introduction(campaign.getIntroduction())
+                    .participation(campaign.getParticipation())
+                    .startDate(campaign.getStartDate())
+                    .endDate(campaign.getEndDate())
+                    .postURI(campaign.getPostURI()).build();
+            switch (campaign.getStatus()) {
+                case CampaignStatus.PENDING:
+                    respCampaigns.setState("pending");
+                    break;
+                case CampaignStatus.APPROVED:
+                    respCampaigns.setState("approved");
+                    break;
+                case CampaignStatus.REJECTED:
+                    respCampaigns.setState("rejected");
+                    break;
+            }
+            List<String> respCampaignTags = new ArrayList<>();
+            campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
+                    .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
+            respCampaigns.setCampaignTags(respCampaignTags);
+
+            campaignsForResp.add(respCampaigns);
+        }
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get campaigns with uuid list");
+        resp.setCampaigns(campaignsForResp);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }

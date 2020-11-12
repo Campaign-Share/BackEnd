@@ -17,4 +17,5 @@ public interface CampaignHandler {
     ResponseEntity<GetCampaignsSortedByRandom.Response> getCampaignsSortedByRandom(String token, Integer startPaging, Integer countPaging,
                                                                                    String stateFilter, String tagFilter);
     ResponseEntity<GetCampaignWithUUID.Response> getCampaignWithUUID(String token, String userUUID);
+    ResponseEntity<GetCampaignsWithUUIDs.Response> getCampaignsWithUUIDs(GetCampaignsWithUUIDs.Request req, BindingResult bindingResult, String token);
 }
