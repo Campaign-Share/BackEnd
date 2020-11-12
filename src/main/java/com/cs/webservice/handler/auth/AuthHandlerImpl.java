@@ -224,7 +224,7 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setNickName(userInform.getNickName());
         resp.setEmail(userInform.getEmail());
         resp.setProfileURI(userInform.getProfileURI());
-        resp.setCampaignNumber(new GetUserInform.CampaignNumber(1, 50, 100));
+        resp.setCampaignNumber(new UserInformDTO.CampaignNumber(1, 50, 100));
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
