@@ -59,4 +59,10 @@ public class CampaignController {
                                                                             @PathVariable("campaign_uuid") String campaignUUID) {
         return campaignHandler.getCampaignWithUUID(token, campaignUUID);
     }
+
+    @GetMapping(path = "/campaigns", consumes = {"application/json"})
+    public ResponseEntity<GetCampaignsWithUUIDs.Response> getCampaignsWithUUIDs(@Valid @RequestBody GetCampaignsWithUUIDs.Request req, BindingResult bindingResult,
+                                                                        @RequestHeader(value = "Authorization", required = false) String token) {
+        return campaignHandler.getCampaignsWithUUIDs(req, bindingResult, token);
+    }
 }
