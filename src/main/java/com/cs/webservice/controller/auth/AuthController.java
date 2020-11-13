@@ -1,6 +1,7 @@
 package com.cs.webservice.controller.auth;
 
 import com.cs.webservice.dto.auth.*;
+import com.cs.webservice.dto.campaign.GetCampaignsWithUUIDs;
 import com.cs.webservice.handler.auth.AuthHandlerImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,5 +56,11 @@ public class AuthController {
     @PostMapping(path = "/login/admin", consumes = {"application/json"})
     public ResponseEntity<LoginAdminAuth.Response> loginAdminAuth(@Valid @RequestBody LoginAdminAuth.Request req, BindingResult bindingResult) {
         return authHandler.loginAdminAuth(req, bindingResult);
+    }
+
+    @GetMapping(path = "/users", consumes = {"application/json"})
+    public ResponseEntity<GetUserInformsWithUUIDs.Response> getUserInformsWithUUIDs(@Valid @RequestBody GetUserInformsWithUUIDs.Request req, BindingResult bindingResult,
+                                                                                @RequestHeader(value = "Authorization", required = false) String token) {
+        return authHandler.getUserInformsWithUUIDs(req, bindingResult, token);
     }
 }
