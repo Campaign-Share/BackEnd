@@ -2,8 +2,10 @@ package com.cs.webservice.handler.campaign;
 
 import com.cs.webservice.domain.campaign.Campaign;
 import com.cs.webservice.domain.campaign.CampaignTag;
+import com.cs.webservice.domain.campaign.CampaignVote;
 import com.cs.webservice.domain.campaign.repository.CampaignRepository;
 import com.cs.webservice.domain.campaign.repository.CampaignTagRepository;
+import com.cs.webservice.domain.campaign.repository.CampaignVoteRepository;
 import com.cs.webservice.dto.campaign.*;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.CampaignStatus;
@@ -27,6 +29,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     private final CampaignRepository campaignRepository;
 
     private final CampaignTagRepository campaignTagRepository;
+
+    private final CampaignVoteRepository campaignVoteRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -165,7 +169,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .participation(campaign.getParticipation())
                     .startDate(campaign.getStartDate())
                     .endDate(campaign.getEndDate())
-                    .postURI(campaign.getPostURI()).build();
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
                     respCampaigns.setState("pending");
@@ -249,7 +256,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .participation(campaign.getParticipation())
                     .startDate(campaign.getStartDate())
                     .endDate(campaign.getEndDate())
-                    .postURI(campaign.getPostURI()).build();
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
             switch (campaign.getStatus()) {
             case CampaignStatus.PENDING:
                 respCampaigns.setState("pending");
@@ -333,7 +343,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .participation(campaign.getParticipation())
                     .startDate(campaign.getStartDate())
                     .endDate(campaign.getEndDate())
-                    .postURI(campaign.getPostURI()).build();
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
                     respCampaigns.setState("pending");
@@ -417,7 +430,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .participation(campaign.getParticipation())
                     .startDate(campaign.getStartDate())
                     .endDate(campaign.getEndDate())
-                    .postURI(campaign.getPostURI()).build();
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
                     respCampaigns.setState("pending");
@@ -524,7 +540,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     .participation(campaign.getParticipation())
                     .startDate(campaign.getStartDate())
                     .endDate(campaign.getEndDate())
-                    .postURI(campaign.getPostURI()).build();
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
             switch (campaign.getStatus()) {
                 case CampaignStatus.PENDING:
                     respCampaigns.setState("pending");
