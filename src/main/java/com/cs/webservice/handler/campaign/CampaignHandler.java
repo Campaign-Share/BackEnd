@@ -18,4 +18,5 @@ public interface CampaignHandler {
                                                                                    String stateFilter, String tagFilter);
     ResponseEntity<GetCampaignWithUUID.Response> getCampaignWithUUID(String token, String userUUID);
     ResponseEntity<GetCampaignsWithUUIDs.Response> getCampaignsWithUUIDs(GetCampaignsWithUUIDs.Request req, BindingResult bindingResult, String token);
+    ResponseEntity<TakeActionInCampaign.Response> takeActionInCampaign(String token, String campaignUUID, String action);
 }
