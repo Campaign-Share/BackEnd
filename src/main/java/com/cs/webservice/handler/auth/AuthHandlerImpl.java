@@ -8,8 +8,11 @@ import com.cs.webservice.domain.auth.repository.AdminAuthRepository;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
+import com.cs.webservice.domain.campaign.Campaign;
 import com.cs.webservice.dto.auth.*;
+import com.cs.webservice.dto.campaign.CampaignDTO;
 import com.cs.webservice.handler.BaseHandler;
+import com.cs.webservice.utils.CampaignStatus;
 import com.cs.webservice.utils.JwtTokenProvider;
 import com.cs.webservice.utils.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
+import java.rmi.server.UID;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -224,7 +230,11 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setNickName(userInform.getNickName());
         resp.setEmail(userInform.getEmail());
         resp.setProfileURI(userInform.getProfileURI());
-        resp.setCampaignNumber(new UserInformDTO.CampaignNumber(1, 50, 100));
+        resp.setCampaignNumber(CampaignNumberDTO.builder()
+                .approved(1)
+                .rejected(50)
+                .participate(100)
+                .build());
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
@@ -398,6 +408,58 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setAccessToken(jwtTokenProvider.generateAccessToken(adminAuth.getUuid()));
         resp.setUserUUID(adminAuth.getUuid());
         resp.setMessage("succeed to login admin auth");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<GetUserInformsWithUUIDs.Response> getUserInformsWithUUIDs(GetUserInformsWithUUIDs.Request req, BindingResult bindingResult, String token) {
+        var resp = new GetUserInformsWithUUIDs.Response();
+
+        AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+        }
+
+        List<UserInformDTO> userInformsForResp = new ArrayList<>();
+        for (String userUUID: req.getUserUUIDs()) {
+            Optional<UserAuth> selectAuth = userAuthRepository.findById(userUUID);
+            Optional<UserInform> selectInform = userInformRepository.findByUserAuth(UserAuth.builder().uuid(userUUID).build());
+            if (selectInform.isEmpty() || selectAuth.isEmpty()) {
+                resp.setStatus(HttpStatus.NOT_FOUND.value());
+                resp.setMessage("user uuid list contain not exist user");
+                return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+            }
+
+            UserAuth userAuth = selectAuth.get();
+            UserInform userInform = selectInform.get();
+            UserInformDTO respUserInform = UserInformDTO.builder()
+                    .userUUID(userAuth.getUuid())
+                    .userID(userAuth.getUserID())
+                    .name(userInform.getName())
+                    .nickName(userInform.getNickName())
+                    .email(userInform.getEmail())
+                    .profileURI(userInform.getProfileURI())
+                    .campaignNumber(CampaignNumberDTO.builder()
+                            .approved(userInform.getApprovedNumber())
+                            .rejected(userInform.getRejectedNumber())
+                            .participate(userInform.getParticipationNumber())
+                            .build())
+                    .build();
+            userInformsForResp.add(respUserInform);
+        }
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get user informs with uuid list");
+        resp.setUserInforms(userInformsForResp);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
