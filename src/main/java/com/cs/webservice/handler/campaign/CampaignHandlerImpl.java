@@ -568,4 +568,88 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setCampaigns(campaignsForResp);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    public ResponseEntity<TakeActionInCampaign.Response> takeActionInCampaign(String token, String campaignUUID, String action) {
+        var resp = new TakeActionInCampaign.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<Campaign> selectCampaign = campaignRepository.findByUuid(campaignUUID);
+        if (selectCampaign.isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("campaign with that uuid is not exists");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+        Campaign campaign = selectCampaign.get();
+
+        // -1071 -> (투표 시) 이미 투표한 캠페인임
+        // -1072 -> (취소 시) 투표하지 않은 캠페인임
+
+        switch (action) {
+        case "agree":
+            if (campaignVoteRepository.findByVoterUUIDAndCampaignUUID(authenticateResult.uuid, campaignUUID).isPresent()) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1071);
+                resp.setMessage("you already voted to that campaign");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaign.setAgreeNumber(campaign.getAgreeNumber() + 1);
+            campaignRepository.save(campaign);
+            campaignVoteRepository.save(CampaignVote.builder()
+                    .campaignUUID(campaignUUID)
+                    .voterUUID(authenticateResult.uuid)
+                    .agree(true).build());
+            break;
+        case "disagree":
+            if (campaignVoteRepository.findByVoterUUIDAndCampaignUUID(authenticateResult.uuid, campaignUUID).isPresent()) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1071);
+                resp.setMessage("you already voted to that campaign");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaign.setDisagreeNumber(campaign.getDisagreeNumber() + 1);
+            campaignRepository.save(campaign);
+            campaignVoteRepository.save(CampaignVote.builder()
+                    .campaignUUID(campaignUUID)
+                    .voterUUID(authenticateResult.uuid)
+                    .agree(false).build());
+            break;
+        case "cancel-agree":
+            if (campaignVoteRepository.findByVoterUUIDAndCampaignUUIDAndAgree(authenticateResult.uuid, campaignUUID, true).isEmpty()) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1072);
+                resp.setMessage("you don't agree vote to that campaign");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaign.setAgreeNumber(campaign.getAgreeNumber() - 1);
+            campaignRepository.save(campaign);
+            campaignVoteRepository.deleteByVoterUUIDAndCampaignUUID(authenticateResult.uuid, campaignUUID);
+            break;
+        case "cancel-disagree":
+            if (campaignVoteRepository.findByVoterUUIDAndCampaignUUIDAndAgree(authenticateResult.uuid, campaignUUID, false).isEmpty()) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1072);
+                resp.setMessage("you don't disagree vote to that campaign");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaign.setDisagreeNumber(campaign.getDisagreeNumber() + 1);
+            campaignRepository.save(campaign);
+            campaignVoteRepository.deleteByVoterUUIDAndCampaignUUID(authenticateResult.uuid, campaignUUID);
+            break;
+        default:
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage(action + " is not undefined action");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to take action to that campaign");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
