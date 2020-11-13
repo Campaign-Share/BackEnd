@@ -17,4 +17,5 @@ public interface AuthHandler {
     ResponseEntity<DeleteUser.Response> deleteUser(String token, String userUUID);
     ResponseEntity<ChangeUserInform.Response> changeUserInform(ChangeUserInform.Request req, BindingResult bindingResult, String token, String userUUID) throws IOException;
     ResponseEntity<LoginAdminAuth.Response> loginAdminAuth(LoginAdminAuth.Request req, BindingResult bindingResult);
+    ResponseEntity<GetUserInformsWithUUIDs.Response> getUserInformsWithUUIDs(GetUserInformsWithUUIDs.Request req, BindingResult bindingResult, String token);
 }
