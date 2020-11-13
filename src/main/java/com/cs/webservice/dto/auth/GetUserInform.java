@@ -28,6 +28,6 @@ public class GetUserInform {
         private String profileURI;
 
         @JsonProperty("campaign_number")
-        private UserInformDTO.CampaignNumber campaignNumber;
+        private CampaignNumberDTO campaignNumber;
     }
 }
