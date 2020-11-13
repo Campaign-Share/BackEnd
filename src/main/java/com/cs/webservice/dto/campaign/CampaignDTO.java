@@ -42,4 +42,13 @@ public final class CampaignDTO {
 
     @JsonProperty("campaign_tags")
     private List<String> campaignTags;
+
+    @JsonProperty("agree_number")
+    private int agreeNumber;
+
+    @JsonProperty("disagree_number")
+    private int disAgreeNumber;
+
+    @JsonProperty("participation_number")
+    private int participationNumber;
 }
