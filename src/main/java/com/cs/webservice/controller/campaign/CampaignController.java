@@ -65,4 +65,11 @@ public class CampaignController {
                                                                         @RequestHeader(value = "Authorization", required = false) String token) {
         return campaignHandler.getCampaignsWithUUIDs(req, bindingResult, token);
     }
+
+    @PostMapping(path = "/campaigns/{campaign_uuid}/actions/{action}")
+    public ResponseEntity<TakeActionInCampaign.Response> takeActionInCampaign(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                              @PathVariable("campaign_uuid") String campaignUUID,
+                                                                              @PathVariable("action") String action) {
+        return campaignHandler.takeActionInCampaign(token, campaignUUID, action);
+    }
 }
