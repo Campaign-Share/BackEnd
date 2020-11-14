@@ -1,5 +1,6 @@
 package com.cs.webservice.domain.campaign;
 
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -16,7 +17,7 @@ import javax.validation.constraints.Size;
 @Setter
 @Entity(name = "campaign_reports")
 @Table(name = "campaign_reports")
-public class CampaignReport {
+public class CampaignReport extends BaseTimeEntity {
     @Id
     @Column(unique = true, nullable = false, columnDefinition = "CHAR(19)", length = 19, name = "uuid")
     @Size(min = 19, max = 19) @NotNull @NotEmpty @Pattern(regexp = "^report-\\d{12}")
@@ -37,6 +38,12 @@ public class CampaignReport {
     @Column(nullable = false, length = 50, name = "reason")
     @Size(max = 50) @NotNull
     private String reason;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "handled")
+    private boolean handled;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "sanctioned")
+    private boolean sanctioned;
 
     @Builder
     public CampaignReport(String uuid, String reporterUUID, String targetUUID, String field, String reason) {
