@@ -657,7 +657,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    public ResponseEntity<ReportCampaign.Response> reportCampaign(ReportCampaign.Request req, BindingResult bindingResult, String token, String campaignUUID) {
+    public ResponseEntity<ReportCampaign.Response> reportCampaign(ReportCampaign.Request req, BindingResult bindingResult, String token) {
         var resp = new ReportCampaign.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
@@ -674,7 +674,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
         }
 
-        if (campaignRepository.findByUuid(campaignUUID).isEmpty()) {
+        if (campaignRepository.findByUuid(req.getTargetUUID()).isEmpty()) {
             resp.setStatus(HttpStatus.NOT_FOUND.value());
             resp.setMessage("campaign with that uuid is not exists");
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
@@ -682,7 +682,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         // -1081 -> (신고 시) 이미 신고한 캠페인임
 
-        if (campaignReportRepository.findByReporterUUIDAndTargetUUID(authenticateResult.uuid, campaignUUID).isPresent()) {
+        if (campaignReportRepository.findByReporterUUIDAndTargetUUID(authenticateResult.uuid, req.getTargetUUID()).isPresent()) {
             resp.setStatus(HttpStatus.CONFLICT.value());
             resp.setCode(-1081);
             resp.setMessage("you already report to that campaign");
@@ -692,7 +692,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         campaignReportRepository.save(CampaignReport.builder()
                 .uuid(reportUUID)
                 .reporterUUID(authenticateResult.uuid)
-                .targetUUID(campaignUUID)
+                .targetUUID(req.getTargetUUID())
                 .field(req.getField())
                 .reason(req.getReason()).build());
 
