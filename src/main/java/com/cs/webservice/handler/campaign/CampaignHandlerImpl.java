@@ -701,4 +701,70 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setReportUUID(reportUUID);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    public ResponseEntity<GetCampaignReports.Response> getCampaignReports(String token, Integer startPaging, Integer countPaging, String stateStrFilter) {
+        var resp = new GetCampaignReports.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (startPaging == null) {
+            startPaging = 0;
+        }
+        if (countPaging == null) {
+            countPaging = 10;
+        }
+
+        List<CampaignReport> campaignReports;
+        if (stateStrFilter != null) {
+            switch (stateStrFilter) {
+            case "pending":
+                campaignReports = campaignReportRepository.findAllByHandledAndSanctionedWithPagingSortedByCreatedAt(
+                        false, false, startPaging, countPaging);
+                break;
+            case "approved":
+                campaignReports = campaignReportRepository.findAllByHandledAndSanctionedWithPagingSortedByCreatedAt(
+                        true, true, startPaging, countPaging);
+                break;
+            case "rejected":
+                campaignReports = campaignReportRepository.findAllByHandledAndSanctionedWithPagingSortedByCreatedAt(
+                        true, false, startPaging, countPaging);
+                break;
+            default:
+                campaignReports = campaignReportRepository.findAllWithPagingSortedByCreatedAt(startPaging, countPaging);
+            }
+        } else {
+            campaignReports = campaignReportRepository.findAllWithPagingSortedByCreatedAt(startPaging, countPaging);
+        }
+
+        List<CampaignReportDTO> reportsForResp = new ArrayList<>();
+        campaignReports.forEach(report -> {
+            CampaignReportDTO reportForResp = CampaignReportDTO.builder()
+                    .reportUUID(report.getUuid())
+                    .reporterUUID(report.getReporterUUID())
+                    .targetUUID(report.getTargetUUID())
+                    .field(report.getField())
+                    .reason(report.getReason()).build();
+            if (report.isHandled()) {
+                if (report.isSanctioned()) {
+                    reportForResp.setState("approved");
+                } else {
+                    reportForResp.setState("rejected");
+                }
+            } else {
+                reportForResp.setState("pending");
+            }
+            reportsForResp.add(reportForResp);
+        });
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get campaign reports sorted by create time");
+        resp.setCampaignReports(reportsForResp);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
