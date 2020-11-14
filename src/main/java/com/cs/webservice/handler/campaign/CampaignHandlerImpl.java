@@ -1,6 +1,8 @@
 package com.cs.webservice.handler.campaign;
 
+import com.cs.webservice.domain.auth.UserAuth;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
+import com.cs.webservice.domain.auth.repository.UserInformRepository;
 import com.cs.webservice.domain.campaign.Campaign;
 import com.cs.webservice.domain.campaign.CampaignReport;
 import com.cs.webservice.domain.campaign.CampaignTag;
@@ -38,6 +40,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     private final CampaignReportRepository campaignReportRepository;
 
     private final UserAuthRepository userAuthRepository;
+
+    private final UserInformRepository userInformRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -597,6 +601,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         // -1071 -> (투표 시) 이미 투표한 캠페인임
         // -1072 -> (취소 시) 투표하지 않은 캠페인임
+        // -1073 -> (거절 또는 수락 시) 이미 거절 또는 수락한 캠페인임
 
         switch (action) {
         case "agree":
@@ -648,6 +653,44 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             campaign.setDisagreeNumber(campaign.getDisagreeNumber() + 1);
             campaignRepository.save(campaign);
             campaignVoteRepository.deleteByVoterUUIDAndCampaignUUID(authenticateResult.uuid, campaignUUID);
+            break;
+        case "approve":
+            if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+                resp.setStatus(HttpStatus.FORBIDDEN.value());
+                resp.setMessage("this action to campaign is only for admin");
+                return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+            }
+            if (campaign.getStatus() != CampaignStatus.PENDING) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1073);
+                resp.setMessage("that campaign was already approved or rejected");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaign.setStatus(CampaignStatus.APPROVED);
+            campaignRepository.save(campaign);
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(userInform -> {
+                userInform.setApprovedNumber(userInform.getApprovedNumber() + 1);
+                userInformRepository.save(userInform);
+            });
+            break;
+        case "reject":
+            if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+                resp.setStatus(HttpStatus.FORBIDDEN.value());
+                resp.setMessage("this action to campaign is only for admin");
+                return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+            }
+            if (campaign.getStatus() != CampaignStatus.PENDING) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1073);
+                resp.setMessage("that campaign was already approved or rejected");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaign.setStatus(CampaignStatus.REJECTED);
+            campaignRepository.save(campaign);
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(userInform -> {
+                userInform.setRejectedNumber(userInform.getRejectedNumber() + 1);
+                userInformRepository.save(userInform);
+            });
             break;
         default:
             resp.setStatus(HttpStatus.NOT_FOUND.value());
