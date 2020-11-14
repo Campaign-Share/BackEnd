@@ -79,4 +79,11 @@ public class CampaignController {
                                                                   @PathVariable("campaign_uuid") String campaignUUID) {
         return campaignHandler.reportCampaign(req, bindingResult, token, campaignUUID);
     }
+
+    @GetMapping(path = "/reports/sorted-by/create-time")
+    public ResponseEntity<GetCampaignReports.Response> getCampaignReports(@RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
+            @RequestParam(value = "state", required = false) String stateFilter) {
+        return campaignHandler.getCampaignReports(token, startPaging, countPaging, stateFilter);
+    }
 }
