@@ -1,5 +1,6 @@
 package com.cs.webservice.handler.campaign;
 
+import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.campaign.Campaign;
 import com.cs.webservice.domain.campaign.CampaignReport;
 import com.cs.webservice.domain.campaign.CampaignTag;
@@ -35,6 +36,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     private final CampaignVoteRepository campaignVoteRepository;
 
     private final CampaignReportRepository campaignReportRepository;
+
+    private final UserAuthRepository userAuthRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -696,10 +699,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                 .field(req.getField())
                 .reason(req.getReason()).build());
 
-        resp.setStatus(HttpStatus.OK.value());
+        resp.setStatus(HttpStatus.CREATED.value());
         resp.setMessage("succeed to make report to that campaign");
         resp.setReportUUID(reportUUID);
-        return new ResponseEntity<>(resp, HttpStatus.OK);
+        return new ResponseEntity<>(resp, HttpStatus.CREATED);
     }
 
     public ResponseEntity<GetCampaignReports.Response> getCampaignReports(String token, Integer startPaging, Integer countPaging, String stateStrFilter) {
@@ -765,6 +768,88 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("succeed to get campaign reports sorted by create time");
         resp.setCampaignReports(reportsForResp);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    public ResponseEntity<TakeActionInReport.Response> takeActionInReport(String token, String reportUUID, String action) {
+        var resp = new TakeActionInReport.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            resp.setMessage("this API is only for admin");
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+        }
+
+        Optional<CampaignReport> selectReport = campaignReportRepository.findByUuid(reportUUID);
+        if (selectReport.isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("report with that uuid is not exists");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+        CampaignReport campaignReport = selectReport.get();
+
+        // -1091 -> (승인 혹은 거절 시) 이미 처리된 신고임
+
+        switch (action) {
+        case "approve":
+            if (campaignReport.isHandled()) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1091);
+                resp.setMessage("that report is already handled");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaignReport.setHandled(true);
+            campaignReport.setSanctioned(true);
+            campaignReportRepository.save(campaignReport);
+
+            campaignRepository.findByUuid(campaignReport.getTargetUUID()).ifPresent(campaign -> {
+                campaign.setSanctioned(true);
+                campaignRepository.save(campaign);
+                userAuthRepository.findById(campaign.getUserUUID()).ifPresent(userAuth -> {
+                    if (userAuth.isLocked()) return;
+                    LocalDate lockDate;
+                    switch (userAuth.getLockNumber()) {
+                        case 0:
+                            lockDate = LocalDate.now().plusDays(1); break;
+                        case 1:
+                            lockDate = LocalDate.now().plusDays(7); break;
+                        default:
+                            lockDate = LocalDate.now().plusDays(30); break;
+                    }
+                    userAuth.setLocked(true);
+                    userAuth.setLockPeriod(lockDate);
+                    userAuth.setLockNumber(userAuth.getLockNumber() + 1);
+                    userAuthRepository.save(userAuth);
+                });
+            });
+            break;
+        case "reject":
+            if (campaignReport.isHandled()) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1091);
+                resp.setMessage("that report is already handled");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaignReport.setHandled(true);
+            campaignReport.setSanctioned(false);
+            campaignReportRepository.save(campaignReport);
+            break;
+        default:
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage(action + " is undefined action");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to take action to that campaign report");
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
