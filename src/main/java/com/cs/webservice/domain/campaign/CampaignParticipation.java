@@ -1,5 +1,6 @@
 package com.cs.webservice.domain.campaign;
 
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ import java.util.List;
 @Setter
 @Entity(name = "campaign_participations")
 @Table(name = "campaign_participations")
-public class CampaignParticipation {
+public class CampaignParticipation extends BaseTimeEntity {
     @Id
     @Column(unique = true, nullable = false, columnDefinition = "CHAR(26)", length = 26, name = "uuid")
     @Size(min = 26, max = 26) @NotNull @NotEmpty @Pattern(regexp = "^participation-\\d{12}")

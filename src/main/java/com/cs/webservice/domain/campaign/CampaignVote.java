@@ -1,5 +1,6 @@
 package com.cs.webservice.domain.campaign;
 
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,7 +21,7 @@ import javax.validation.constraints.Size;
 @Setter
 @Entity(name = "campaign_votes")
 @Table(name = "campaign_votes")
-public class CampaignVote {
+public class CampaignVote extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;

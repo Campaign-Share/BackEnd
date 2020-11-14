@@ -5,6 +5,7 @@ package com.cs.webservice.domain.campaign;
 //  file_uri varchar(100)
 //}
 
+import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,7 +20,7 @@ import javax.validation.constraints.Size;
 @Setter
 @Entity(name = "campaign_participation_files")
 @Table(name = "campaign_participation_files")
-public class CampaignParticipationFile {
+public class CampaignParticipationFile extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;
