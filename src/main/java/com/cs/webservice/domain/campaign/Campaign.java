@@ -6,10 +6,7 @@ import com.cs.webservice.domain.auth.UserAuth;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +28,7 @@ public class Campaign extends BaseTimeEntity {
     private String userUUID;
 
     @Column(name = "status", columnDefinition = "TINYINT(1) DEFAULT 0")
+    @Min(0) @Max(2)
     private int status;
 
     @Column(columnDefinition = "CHAR(18)", length = 18, name = "accepter_uuid")
@@ -62,6 +60,9 @@ public class Campaign extends BaseTimeEntity {
     @Column(length = 100, name = "post_uri")
     @Size(max = 100)
     private String postURI;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "sanctioned")
+    private boolean sanctioned;
 
     @OneToMany(mappedBy = "campaignUUID", cascade = CascadeType.ALL)
     private List<CampaignTag> campaignTags;
