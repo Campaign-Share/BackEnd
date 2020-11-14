@@ -8,11 +8,8 @@ import com.cs.webservice.domain.auth.repository.AdminAuthRepository;
 import com.cs.webservice.domain.auth.repository.EmailCertifyRepository;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
-import com.cs.webservice.domain.campaign.Campaign;
 import com.cs.webservice.dto.auth.*;
-import com.cs.webservice.dto.campaign.CampaignDTO;
 import com.cs.webservice.handler.BaseHandler;
-import com.cs.webservice.utils.CampaignStatus;
 import com.cs.webservice.utils.JwtTokenProvider;
 import com.cs.webservice.utils.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
-import java.rmi.server.UID;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -472,6 +468,50 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
 
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("succeed to get user informs with uuid list");
+        resp.setUserInforms(userInformsForResp);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    public ResponseEntity<GetUsersSortedByParticipate.Response> getUsersSortedByParticipate(String token, Integer startPaging, Integer countPaging) {
+        var resp = new GetUsersSortedByParticipate.Response();
+
+        AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (startPaging == null) {
+            startPaging = 0;
+        }
+        if (countPaging == null) {
+            countPaging = 10;
+        }
+
+        List<UserInformDTO> userInformsForResp = new ArrayList<>();
+        userInformRepository.findAllWithPagingSortedByParticipationNumber(startPaging, countPaging).forEach(userInform -> {
+            UserInformDTO userInformForResp = UserInformDTO.builder()
+                    .name(userInform.getName())
+                    .nickName(userInform.getNickName())
+                    .email(userInform.getEmail())
+                    .profileURI(userInform.getProfileURI())
+                    .campaignNumber(CampaignNumberDTO.builder()
+                            .approved(userInform.getApprovedNumber())
+                            .rejected(userInform.getRejectedNumber())
+                            .participate(userInform.getParticipationNumber())
+                            .build())
+                    .build();
+            userAuthRepository.findById(userInform.getUserAuth().getUuid()).ifPresent(userAuth -> {
+                userInformForResp.setUserUUID(userAuth.getUuid());
+                userInformForResp.setUserID(userAuth.getUserID());
+            });
+            userInformsForResp.add(userInformForResp);
+        });
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get user informs sorted by participation number");
         resp.setUserInforms(userInformsForResp);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
