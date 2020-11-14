@@ -231,9 +231,9 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
         resp.setEmail(userInform.getEmail());
         resp.setProfileURI(userInform.getProfileURI());
         resp.setCampaignNumber(CampaignNumberDTO.builder()
-                .approved(1)
-                .rejected(50)
-                .participate(100)
+                .approved(userInform.getApprovedNumber())
+                .rejected(userInform.getRejectedNumber())
+                .participate(userInform.getParticipationNumber())
                 .build());
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
