@@ -1,7 +1,6 @@
 package com.cs.webservice.controller.auth;
 
 import com.cs.webservice.dto.auth.*;
-import com.cs.webservice.dto.campaign.GetCampaignsWithUUIDs;
 import com.cs.webservice.handler.auth.AuthHandlerImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +61,12 @@ public class AuthController {
     public ResponseEntity<GetUserInformsWithUUIDs.Response> getUserInformsWithUUIDs(@Valid @RequestBody GetUserInformsWithUUIDs.Request req, BindingResult bindingResult,
                                                                                 @RequestHeader(value = "Authorization", required = false) String token) {
         return authHandler.getUserInformsWithUUIDs(req, bindingResult, token);
+    }
+
+    @GetMapping(path = "/users/sorted-by/participate")
+    public ResponseEntity<GetUsersSortedByParticipate.Response> getUsersSortedByParticipate(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging) {
+        return authHandler.getUsersSortedByParticipate(token, startPaging, countPaging);
     }
 }
