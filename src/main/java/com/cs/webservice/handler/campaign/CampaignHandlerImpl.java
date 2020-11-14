@@ -1,8 +1,10 @@
 package com.cs.webservice.handler.campaign;
 
 import com.cs.webservice.domain.campaign.Campaign;
+import com.cs.webservice.domain.campaign.CampaignReport;
 import com.cs.webservice.domain.campaign.CampaignTag;
 import com.cs.webservice.domain.campaign.CampaignVote;
+import com.cs.webservice.domain.campaign.repository.CampaignReportRepository;
 import com.cs.webservice.domain.campaign.repository.CampaignRepository;
 import com.cs.webservice.domain.campaign.repository.CampaignTagRepository;
 import com.cs.webservice.domain.campaign.repository.CampaignVoteRepository;
@@ -31,6 +33,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     private final CampaignTagRepository campaignTagRepository;
 
     private final CampaignVoteRepository campaignVoteRepository;
+
+    private final CampaignReportRepository campaignReportRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -650,6 +654,51 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("succeed to take action to that campaign");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    public ResponseEntity<ReportCampaign.Response> reportCampaign(ReportCampaign.Request req, BindingResult bindingResult, String token, String campaignUUID) {
+        var resp = new ReportCampaign.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+        }
+
+        if (campaignRepository.findByUuid(campaignUUID).isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("campaign with that uuid is not exists");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+
+        // -1081 -> (신고 시) 이미 신고한 캠페인임
+
+        if (campaignReportRepository.findByReporterUUIDAndTargetUUID(authenticateResult.uuid, campaignUUID).isPresent()) {
+            resp.setStatus(HttpStatus.CONFLICT.value());
+            resp.setCode(-1081);
+            resp.setMessage("you already report to that campaign");
+            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+        }
+        String reportUUID = campaignReportRepository.getAvailableUUID();
+        campaignReportRepository.save(CampaignReport.builder()
+                .uuid(reportUUID)
+                .reporterUUID(authenticateResult.uuid)
+                .targetUUID(campaignUUID)
+                .field(req.getField())
+                .reason(req.getReason()).build());
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to make report to that campaign");
+        resp.setReportUUID(reportUUID);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
