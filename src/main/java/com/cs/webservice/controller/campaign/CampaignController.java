@@ -54,7 +54,7 @@ public class CampaignController {
         return campaignHandler.getCampaignsSortedByRandom(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 
-    @GetMapping(path = "/campaigns/{campaign_uuid}")
+    @GetMapping(path = "/campaigns/uuid/{campaign_uuid}")
     public ResponseEntity<GetCampaignWithUUID.Response> getCampaignWithUUID(@RequestHeader(value = "Authorization", required = false) String token,
                                                                             @PathVariable("campaign_uuid") String campaignUUID) {
         return campaignHandler.getCampaignWithUUID(token, campaignUUID);
@@ -66,7 +66,7 @@ public class CampaignController {
         return campaignHandler.getCampaignsWithUUIDs(req, bindingResult, token);
     }
 
-    @PostMapping(path = "/campaigns/{campaign_uuid}/actions/{action}")
+    @PostMapping(path = "/campaigns/uuid/{campaign_uuid}/actions/{action}")
     public ResponseEntity<TakeActionInCampaign.Response> takeActionInCampaign(@RequestHeader(value = "Authorization", required = false) String token,
                                                                               @PathVariable("campaign_uuid") String campaignUUID,
                                                                               @PathVariable("action") String action) {
@@ -84,5 +84,12 @@ public class CampaignController {
             @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
             @RequestParam(value = "state", required = false) String stateFilter) {
         return campaignHandler.getCampaignReports(token, startPaging, countPaging, stateFilter);
+    }
+
+    @PostMapping(path = "/reports/uuid/{report_uuid}/actions/{action}")
+    public ResponseEntity<TakeActionInReport.Response> takeActionInReport(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                              @PathVariable("report_uuid") String reportUUID,
+                                                                              @PathVariable("action") String action) {
+        return campaignHandler.takeActionInReport(token, reportUUID, action);
     }
 }
