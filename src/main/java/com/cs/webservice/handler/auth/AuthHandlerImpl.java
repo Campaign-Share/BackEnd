@@ -25,6 +25,7 @@ import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
 import java.rmi.server.UID;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -138,6 +139,18 @@ public class AuthHandlerImpl extends BaseHandler implements AuthHandler {
             resp.setCode(-1032);
             resp.setMessage("incorrect user password");
             return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+        }
+
+        if (userAuth.isLocked()) {
+            if (!userAuth.getLockPeriod().isBefore(LocalDate.now())) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1033);
+                resp.setMessage("this user auth is currently sanctioned");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            } else {
+                userAuth.setLocked(false);
+                userAuthRepository.save(userAuth);
+            }
         }
 
         resp.setStatus(HttpStatus.OK.value());
