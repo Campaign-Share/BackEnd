@@ -72,4 +72,11 @@ public class CampaignController {
                                                                               @PathVariable("action") String action) {
         return campaignHandler.takeActionInCampaign(token, campaignUUID, action);
     }
+
+    @PostMapping(path = "/campaigns/{campaign_uuid}/report")
+    public ResponseEntity<ReportCampaign.Response> reportCampaign(@Valid @RequestBody ReportCampaign.Request req, BindingResult bindingResult,
+                                                                  @RequestHeader(value = "Authorization", required = false) String token,
+                                                                  @PathVariable("campaign_uuid") String campaignUUID) {
+        return campaignHandler.reportCampaign(req, bindingResult, token, campaignUUID);
+    }
 }
