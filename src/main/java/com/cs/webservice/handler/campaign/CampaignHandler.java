@@ -21,4 +21,5 @@ public interface CampaignHandler {
     ResponseEntity<TakeActionInCampaign.Response> takeActionInCampaign(String token, String campaignUUID, String action);
     ResponseEntity<ReportCampaign.Response> reportCampaign(ReportCampaign.Request req, BindingResult bindingResult, String token);
     ResponseEntity<GetCampaignReports.Response> getCampaignReports(String token, Integer startPaging, Integer countPaging, String stateFilter);
+    ResponseEntity<TakeActionInReport.Response> takeActionInReport(String token, String reportUUID, String action);
 }
