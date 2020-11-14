@@ -14,6 +14,8 @@ public interface CampaignReportRepository extends JpaRepository<CampaignReport, 
 
     @Query(value = "SELECT * FROM campaign_reports WHERE handled = ?1 AND sanctioned = ?2 ORDER BY created_at DESC LIMIT ?4 OFFSET ?3", nativeQuery = true)
     List<CampaignReport> findAllByHandledAndSanctionedWithPagingSortedByCreatedAt(boolean handled, boolean sanctioned, Integer start, Integer count);
+    @Query(value = "SELECT * FROM campaign_reports ORDER BY created_at DESC LIMIT ?2 OFFSET ?1", nativeQuery = true)
+    List<CampaignReport> findAllWithPagingSortedByCreatedAt(Integer start, Integer count);
 
     default String getAvailableUUID() {
         while (true) {
