@@ -15,7 +15,11 @@ public class ReportCampaign {
     @Setter
     @NoArgsConstructor
     public static class Request {
-        @Size(max = 20) @NotNull
+        @Size(max = 21) @NotNull @NotEmpty
+        @JsonProperty("target_uuid")
+        private String targetUUID;
+
+        @Size(max = 20) @NotNull @NotEmpty
         @NotEmpty
         @JsonProperty("field")
         private String field;
