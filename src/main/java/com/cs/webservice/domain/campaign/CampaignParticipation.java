@@ -4,10 +4,7 @@ import com.cs.webservice.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,25 +27,28 @@ public class CampaignParticipation extends BaseTimeEntity {
     @Size(min = 21, max = 21) @Pattern(regexp = "^campaign-\\d{12}")
     private String campaignUUID;
 
-    @Column(nullable = false, length = 300, name = "information") // 길이 미정
+    @Column(nullable = false, length = 300, name = "introduction") // 길이 미정
     @Size(max = 300) @NotNull
-    private String information;
+    private String introduction;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE", name = "accepted")
-    private boolean accepted;
+    @Column(name = "status", columnDefinition = "TINYINT(1) DEFAULT 0")
+    @Min(0) @Max(2)
+    private int status;
+
+    @Column(length = 100, name = "evidence_uri")
+    @Size(max = 100)
+    private String evidenceURI;
 
     @Column(columnDefinition = "CHAR(18)", length = 18, name = "accepter_uuid")
     @Size(min = 18, max = 18) @Pattern(regexp = "^admin-\\d{12}")
     private String accepterUUID;
 
-    @OneToMany(mappedBy = "participationUUID", cascade = CascadeType.ALL)
-    private List<CampaignParticipationFile> campaignParticipationFiles;
-
     @Builder
-    public CampaignParticipation(String uuid, String participantUUID, String campaignUUID, String information) {
+    public CampaignParticipation(String uuid, String participantUUID, String campaignUUID, String introduction, String evidenceURI) {
         this.uuid = uuid;
         this.participantUUID = participantUUID;
         this.campaignUUID = campaignUUID;
-        this.information = information;
+        this.introduction = introduction;
+        this.evidenceURI = evidenceURI;
     }
 }
