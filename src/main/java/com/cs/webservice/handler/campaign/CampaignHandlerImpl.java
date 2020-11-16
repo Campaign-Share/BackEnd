@@ -955,4 +955,70 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setParticipationUUID(participationUUID);
         return new ResponseEntity<>(resp, HttpStatus.CREATED);
     }
+
+    public ResponseEntity<GetCampaignsSortedByParticipation.Response> getCampaignsSortedByParticipation(String token, Integer startPaging, Integer countPaging) {
+        var resp = new GetCampaignsSortedByParticipation.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            resp.setMessage("this API is only for admin");
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+        }
+
+        if (startPaging == null) {
+            startPaging = 0;
+        }
+        if (countPaging == null) {
+            countPaging = 10;
+        }
+
+        List<CampaignDTO> campaignsForResp = new ArrayList<>();
+        List<String> campaignUUID = campaignParticipationRepository.findAllWithPagingSortedByTotalPendingNumber(startPaging, countPaging);
+        campaignRepository.findAllByUUIDSortedByUUID(campaignUUID).forEach(campaign -> {
+            CampaignDTO respCampaigns = CampaignDTO.builder()
+                    .campaignUUID(campaign.getUuid())
+                    .userUUID(campaign.getUserUUID())
+                    .title(campaign.getTitle())
+                    .subTitle(campaign.getSubTitle())
+                    .introduction(campaign.getIntroduction())
+                    .participation(campaign.getParticipation())
+                    .startDate(campaign.getStartDate())
+                    .endDate(campaign.getEndDate())
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
+            switch (campaign.getStatus()) {
+                case CampaignStatus.PENDING:
+                    respCampaigns.setState("pending");
+                    break;
+                case CampaignStatus.APPROVED:
+                    respCampaigns.setState("approved");
+                    break;
+                case CampaignStatus.REJECTED:
+                    respCampaigns.setState("rejected");
+                    break;
+            }
+
+            List<String> respCampaignTags = new ArrayList<>();
+            campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
+                    .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
+
+            respCampaigns.setCampaignTags(respCampaignTags);
+            campaignsForResp.add(respCampaigns);
+        });
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get campaigns sorted by total pending participation number");
+        resp.setCampaigns(campaignsForResp);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
