@@ -119,4 +119,10 @@ public class CampaignController {
                                                                           @RequestParam(value = "state", required = false) String stateFilter) {
         return campaignHandler.getParticipationsSortedByCreate(token, campaignUUID, startPaging, countPaging, stateFilter);
     }
+
+    @GetMapping(path = "participations/uuid/{participation_uuid}")
+    public ResponseEntity<GetParticipationWithUUID.Response> getParticipationWithUUID(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                      @PathVariable("participation_uuid") String participationUUID) {
+        return campaignHandler.getParticipationWithUUID(token, participationUUID);
+    }
 }
