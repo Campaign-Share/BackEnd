@@ -3,14 +3,8 @@ package com.cs.webservice.handler.campaign;
 import com.cs.webservice.domain.auth.UserAuth;
 import com.cs.webservice.domain.auth.repository.UserAuthRepository;
 import com.cs.webservice.domain.auth.repository.UserInformRepository;
-import com.cs.webservice.domain.campaign.Campaign;
-import com.cs.webservice.domain.campaign.CampaignReport;
-import com.cs.webservice.domain.campaign.CampaignTag;
-import com.cs.webservice.domain.campaign.CampaignVote;
-import com.cs.webservice.domain.campaign.repository.CampaignReportRepository;
-import com.cs.webservice.domain.campaign.repository.CampaignRepository;
-import com.cs.webservice.domain.campaign.repository.CampaignTagRepository;
-import com.cs.webservice.domain.campaign.repository.CampaignVoteRepository;
+import com.cs.webservice.domain.campaign.*;
+import com.cs.webservice.domain.campaign.repository.*;
 import com.cs.webservice.dto.campaign.*;
 import com.cs.webservice.handler.BaseHandler;
 import com.cs.webservice.utils.CampaignStatus;
@@ -38,6 +32,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     private final CampaignVoteRepository campaignVoteRepository;
 
     private final CampaignReportRepository campaignReportRepository;
+
+    private final CampaignParticipationRepository campaignParticipationRepository;
 
     private final UserAuthRepository userAuthRepository;
 
@@ -895,5 +891,58 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setStatus(HttpStatus.OK.value());
         resp.setMessage("succeed to take action to that campaign report");
         return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    public ResponseEntity<CreateNewParticipation.Response> createNewParticipation(CreateNewParticipation.Request req, BindingResult bindingResult, String token) throws IOException {
+        var resp = new CreateNewParticipation.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (bindingResult.hasErrors()) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
+            resp.setMessage(bindingResult.getAllErrors().toString());
+            return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+        }
+
+        if (campaignRepository.findByUuid(req.getCampaignUUID()).isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("campaign with that uuid is not exist");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+
+        // -1101 -> 이미 참여 인증을 신청한 캠페인임
+
+        if (campaignParticipationRepository.findByParticipantUUIDAndCampaignUUID(authenticateResult.uuid, req.getCampaignUUID()).isPresent()) {
+            resp.setStatus(HttpStatus.CONFLICT.value());
+            resp.setCode(-1101);
+            resp.setMessage("you already send participation to that campaign");
+            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+        }
+
+        String participationUUID = campaignParticipationRepository.getAvailableUUID();
+        CampaignParticipation campaignParticipation = CampaignParticipation.builder()
+                .uuid(participationUUID)
+                .campaignUUID(req.getCampaignUUID())
+                .participantUUID(authenticateResult.uuid)
+                .introduction(req.getIntroduction()).build();
+
+        if (req.getEvidence() != null) {
+            String evidenceURI = "campaign/evidences/" + participationUUID;
+            campaignParticipation.setEvidenceURI(evidenceURI);
+            s3Service.upload(req.getEvidence(), evidenceURI);
+        }
+
+        campaignParticipationRepository.save(campaignParticipation);
+
+        resp.setStatus(HttpStatus.CREATED.value());
+        resp.setMessage("succeed to create new campaign participation");
+        resp.setParticipationUUID(participationUUID);
+        return new ResponseEntity<>(resp, HttpStatus.CREATED);
     }
 }
