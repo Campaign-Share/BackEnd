@@ -31,9 +31,9 @@ public class CampaignParticipation extends BaseTimeEntity {
     @Size(max = 300) @NotNull
     private String introduction;
 
-    @Column(name = "status", columnDefinition = "TINYINT(1) DEFAULT 0")
+    @Column(name = "state", columnDefinition = "TINYINT(1) DEFAULT 0")
     @Min(0) @Max(2)
-    private int status;
+    private int state;
 
     @Column(length = 100, name = "evidence_uri")
     @Size(max = 100)
