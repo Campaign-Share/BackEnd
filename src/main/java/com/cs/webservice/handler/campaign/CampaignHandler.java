@@ -26,4 +26,5 @@ public interface CampaignHandler {
     ResponseEntity<GetCampaignsSortedByParticipation.Response> getCampaignsSortedByParticipation(String token, Integer startPaging, Integer countPaging);
     ResponseEntity<GetParticipationsWithUUID.Response> getParticipationsSortedByCreate(String token, String campaignUUID,
                                                                                        Integer startPaging, Integer countPaging, String stateFilter);
+    ResponseEntity<GetParticipationWithUUID.Response> getParticipationWithUUID(String token, String participationUUID);
 }

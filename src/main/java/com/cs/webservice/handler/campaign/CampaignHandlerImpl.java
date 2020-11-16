@@ -1104,4 +1104,51 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setParticipations(participationsForResp);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    public ResponseEntity<GetParticipationWithUUID.Response> getParticipationWithUUID(String token, String participationUUID) {
+        var resp = new GetParticipationWithUUID.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            resp.setMessage("this API is only for admin");
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+        }
+
+        Optional<CampaignParticipation> selectParticipation = campaignParticipationRepository.findById(participationUUID);
+        if (selectParticipation.isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("participation with that uuid is not exists");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+        CampaignParticipation campaignParticipation = selectParticipation.get();
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get campaign participation inform with uuid");
+        resp.setParticipationUUID(campaignParticipation.getUuid());
+        resp.setCampaignUUID(campaignParticipation.getCampaignUUID());
+        resp.setParticipantUUID(campaignParticipation.getParticipantUUID());
+        resp.setIntroduction(campaignParticipation.getIntroduction());
+        resp.setEvidenceURI(campaignParticipation.getEvidenceURI());
+        switch (campaignParticipation.getState()) {
+            case CampaignStatus.PENDING:
+                resp.setState("pending");
+                break;
+            case CampaignStatus.APPROVED:
+                resp.setState("approved");
+                break;
+            case CampaignStatus.REJECTED:
+                resp.setState("rejected");
+                break;
+        }
+
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
