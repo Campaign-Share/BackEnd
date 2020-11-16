@@ -18,39 +18,43 @@ public class CampaignController {
 
     @PostMapping(path = "/campaigns", consumes = {"multipart/form-data"})
     public ResponseEntity<CreateNewCampaign.Response> createNewCampaign(@Valid @ModelAttribute CreateNewCampaign.Request req, BindingResult bindingResult,
-                                                        @RequestHeader(value = "Authorization", required = false) String token) throws IOException {
+                                                                        @RequestHeader(value = "Authorization", required = false) String token) throws IOException {
         return campaignHandler.createNewCampaign(req, bindingResult, token);
     }
 
     @GetMapping(path = "/users/uuid/{user_uuid}/campaigns")
-    public ResponseEntity<GetCampaignsWithUserUUID.Response> getCampaignsWithUserUUID(
-            @RequestHeader(value = "Authorization", required = false) String token, @PathVariable("user_uuid") String userUUID,
-            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "state", required = false) String stateFilter) {
+    public ResponseEntity<GetCampaignsWithUserUUID.Response> getCampaignsWithUserUUID(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                      @PathVariable("user_uuid") String userUUID,
+                                                                                      @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                                      @RequestParam(value = "count", required = false) Integer countPaging,
+                                                                                      @RequestParam(value = "state", required = false) String stateFilter) {
         return campaignHandler.getCampaignsWithUserUUID(token, userUUID, startPaging, countPaging, stateFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/create-time")
-    public ResponseEntity<GetCampaignsSortedByCreate.Response> getCampaignsSortedByCreate(
-            @RequestHeader(value = "Authorization", required = false) String token,
-            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+    public ResponseEntity<GetCampaignsSortedByCreate.Response> getCampaignsSortedByCreate(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                          @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                                          @RequestParam(value = "count", required = false) Integer countPaging,
+                                                                                          @RequestParam(value = "state", required = false) String stateFilter,
+                                                                                          @RequestParam(value = "tag", required = false) String tagFilter) {
         return campaignHandler.getCampaignsSortedByCreate(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/famous")
-    public ResponseEntity<GetCampaignsSortedByFamous.Response> getCampaignsSortedByFamous(
-            @RequestHeader(value = "Authorization", required = false) String token,
-            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+    public ResponseEntity<GetCampaignsSortedByFamous.Response> getCampaignsSortedByFamous(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                          @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                                          @RequestParam(value = "count", required = false) Integer countPaging,
+                                                                                          @RequestParam(value = "state", required = false) String stateFilter,
+                                                                                          @RequestParam(value = "tag", required = false) String tagFilter) {
         return campaignHandler.getCampaignsSortedByFamous(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 
     @GetMapping(path = "/campaigns/sorted-by/random")
-    public ResponseEntity<GetCampaignsSortedByRandom.Response> getCampaignsSortedByRandom(
-            @RequestHeader(value = "Authorization", required = false) String token,
-            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "state", required = false) String stateFilter, @RequestParam(value = "tag", required = false) String tagFilter) {
+    public ResponseEntity<GetCampaignsSortedByRandom.Response> getCampaignsSortedByRandom(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                          @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                                          @RequestParam(value = "count", required = false) Integer countPaging,
+                                                                                          @RequestParam(value = "state", required = false) String stateFilter,
+                                                                                          @RequestParam(value = "tag", required = false) String tagFilter) {
         return campaignHandler.getCampaignsSortedByRandom(token, startPaging, countPaging, stateFilter, tagFilter);
     }
 
@@ -62,7 +66,7 @@ public class CampaignController {
 
     @GetMapping(path = "/campaigns", consumes = {"application/json"})
     public ResponseEntity<GetCampaignsWithUUIDs.Response> getCampaignsWithUUIDs(@Valid @RequestBody GetCampaignsWithUUIDs.Request req, BindingResult bindingResult,
-                                                                        @RequestHeader(value = "Authorization", required = false) String token) {
+                                                                                @RequestHeader(value = "Authorization", required = false) String token) {
         return campaignHandler.getCampaignsWithUUIDs(req, bindingResult, token);
     }
 
@@ -81,15 +85,22 @@ public class CampaignController {
 
     @GetMapping(path = "/reports/sorted-by/create-time")
     public ResponseEntity<GetCampaignReports.Response> getCampaignReports(@RequestHeader(value = "Authorization", required = false) String token,
-            @RequestParam(value = "start", required = false) Integer startPaging, @RequestParam(value = "count", required = false) Integer countPaging,
-            @RequestParam(value = "state", required = false) String stateFilter) {
+                                                                          @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                          @RequestParam(value = "count", required = false) Integer countPaging,
+                                                                          @RequestParam(value = "state", required = false) String stateFilter) {
         return campaignHandler.getCampaignReports(token, startPaging, countPaging, stateFilter);
     }
 
     @PostMapping(path = "/reports/uuid/{report_uuid}/actions/{action}")
     public ResponseEntity<TakeActionInReport.Response> takeActionInReport(@RequestHeader(value = "Authorization", required = false) String token,
-                                                                              @PathVariable("report_uuid") String reportUUID,
-                                                                              @PathVariable("action") String action) {
+                                                                          @PathVariable("report_uuid") String reportUUID,
+                                                                          @PathVariable("action") String action) {
         return campaignHandler.takeActionInReport(token, reportUUID, action);
+    }
+
+    @PostMapping(path = "/participations", consumes = {"multipart/form-data"})
+    public ResponseEntity<CreateNewParticipation.Response> createNewParticipation(@Valid @ModelAttribute CreateNewParticipation.Request req, BindingResult bindingResult,
+                                                                                  @RequestHeader(value = "Authorization", required = false) String token) throws IOException {
+        return campaignHandler.createNewParticipation(req, bindingResult, token);
     }
 }
