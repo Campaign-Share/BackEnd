@@ -82,12 +82,12 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         LocalDate nowDate = LocalDate.now();
         List<Campaign> currentCampaigns = campaignRepository.findAllByUserUUIDAndEndDateGreaterThanEqual(authenticateResult.uuid, nowDate);
-        if (currentCampaigns.size() >= 3) {
-            resp.setStatus(HttpStatus.CONFLICT.value());
-            resp.setCode(-1061);
-            resp.setMessage("you have exceeded the number of registered campaigns");
-            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
-        }
+//        if (currentCampaigns.size() >= 3) {
+//            resp.setStatus(HttpStatus.CONFLICT.value());
+//            resp.setCode(-1061);
+//            resp.setMessage("you have exceeded the number of registered campaigns");
+//            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+//        }
 
         String campaignUUID = campaignRepository.getAvailableUUID();
         Campaign campaign = Campaign.builder()
@@ -502,6 +502,9 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setStartDate(campaign.getStartDate());
         resp.setEndDate(campaign.getEndDate());
         resp.setPostURI(campaign.getPostURI());
+        resp.setAgreeNumber(campaign.getAgreeNumber());
+        resp.setDisAgreeNumber(campaign.getDisagreeNumber());
+        resp.setParticipationNumber(campaign.getParticipationNumber());
         switch (campaign.getStatus()) {
             case CampaignStatus.PENDING:
                 resp.setState("pending");
@@ -598,10 +601,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
         Campaign campaign = selectCampaign.get();
-
-        // -1071 -> (투표 시) 이미 투표한 캠페인임
-        // -1072 -> (취소 시) 투표하지 않은 캠페인임
-        // -1073 -> (거절 또는 수락 시) 이미 거절 또는 수락한 캠페인임
 
         switch (action) {
         case "agree":
@@ -726,8 +725,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
 
-        // -1081 -> (신고 시) 이미 신고한 캠페인임
-
         if (campaignReportRepository.findByReporterUUIDAndTargetUUID(authenticateResult.uuid, req.getTargetUUID()).isPresent()) {
             resp.setStatus(HttpStatus.CONFLICT.value());
             resp.setCode(-1081);
@@ -757,6 +754,12 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             resp.setCode(authenticateResult.code);
             resp.setMessage(authenticateResult.message);
             return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            resp.setMessage("this API is only for admin");
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
         }
 
         if (startPaging == null) {
@@ -838,8 +841,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
         CampaignReport campaignReport = selectReport.get();
-
-        // -1091 -> (승인 혹은 거절 시) 이미 처리된 신고임
 
         switch (action) {
         case "approve":
