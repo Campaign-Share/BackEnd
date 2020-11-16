@@ -24,4 +24,6 @@ public interface CampaignHandler {
     ResponseEntity<TakeActionInReport.Response> takeActionInReport(String token, String reportUUID, String action);
     ResponseEntity<CreateNewParticipation.Response> createNewParticipation(CreateNewParticipation.Request req, BindingResult bindingResult, String token) throws IOException;
     ResponseEntity<GetCampaignsSortedByParticipation.Response> getCampaignsSortedByParticipation(String token, Integer startPaging, Integer countPaging);
+    ResponseEntity<GetParticipationsWithUUID.Response> getParticipationsSortedByCreate(String token, String campaignUUID,
+                                                                                       Integer startPaging, Integer countPaging, String stateFilter);
 }
