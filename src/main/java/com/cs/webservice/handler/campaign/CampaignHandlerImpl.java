@@ -910,17 +910,27 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
         }
 
-        if (campaignRepository.findByUuid(req.getCampaignUUID()).isEmpty()) {
+        Optional<Campaign> selectCampaign = campaignRepository.findByUuid(req.getCampaignUUID());
+        if (selectCampaign.isEmpty()) {
             resp.setStatus(HttpStatus.NOT_FOUND.value());
             resp.setMessage("campaign with that uuid is not exist");
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
 
-        // -1101 -> 이미 참여 인증을 신청한 캠페인임
+        // -1101 -> 수락된 캠페인이 아님
+        // -1102 -> 이미 참여 인증을 신청한 캠페인임
+
+        Campaign campaign = selectCampaign.get();
+        if (campaign.getStatus() != CampaignStatus.APPROVED) {
+            resp.setStatus(HttpStatus.CONFLICT.value());
+            resp.setCode(-1101);
+            resp.setMessage("that campaign is not approved yet");
+            return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+        }
 
         if (campaignParticipationRepository.findByParticipantUUIDAndCampaignUUID(authenticateResult.uuid, req.getCampaignUUID()).isPresent()) {
             resp.setStatus(HttpStatus.CONFLICT.value());
-            resp.setCode(-1101);
+            resp.setCode(-1102);
             resp.setMessage("you already send participation to that campaign");
             return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
         }
