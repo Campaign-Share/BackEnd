@@ -110,4 +110,13 @@ public class CampaignController {
                                                                                                         @RequestParam(value = "count", required = false) Integer countPaging) {
         return campaignHandler.getCampaignsSortedByParticipation(token, startPaging, countPaging);
     }
+
+    @GetMapping(path = "/campaigns/uuid/{campaign_uuid}/participations")
+    public ResponseEntity<GetParticipationsWithUUID.Response> getParticipationsWithUUID(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                          @PathVariable("campaign_uuid") String campaignUUID,
+                                                                          @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                          @RequestParam(value = "count", required = false) Integer countPaging,
+                                                                          @RequestParam(value = "state", required = false) String stateFilter) {
+        return campaignHandler.getParticipationsSortedByCreate(token, campaignUUID, startPaging, countPaging, stateFilter);
+    }
 }
