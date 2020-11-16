@@ -1021,4 +1021,87 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         resp.setCampaigns(campaignsForResp);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    public ResponseEntity<GetParticipationsWithUUID.Response> getParticipationsSortedByCreate(String token, String campaignUUID,
+                                                                                              Integer startPaging, Integer countPaging, String stateStrFilter) {
+        var resp = new GetParticipationsWithUUID.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            resp.setMessage("this API is only for admin");
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+        }
+
+        if (campaignRepository.findByUuid(campaignUUID).isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("campaign with that uuid is not exists");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+
+        if (startPaging == null) {
+            startPaging = 0;
+        }
+        if (countPaging == null) {
+            countPaging = 10;
+        }
+
+        Integer stateFilter = null;
+        if (stateStrFilter != null) {
+            switch (stateStrFilter) {
+                case "pending":
+                    stateFilter = CampaignStatus.PENDING;
+                    break;
+                case "approved":
+                    stateFilter = CampaignStatus.APPROVED;
+                    break;
+                case "rejected":
+                    stateFilter = CampaignStatus.REJECTED;
+                    break;
+            }
+        }
+
+        List<CampaignParticipation> campaignParticipations;
+        if (stateFilter != null) {
+            campaignParticipations = campaignParticipationRepository.findAllByCampaignUUIDAndStateWIthPagingSortedByCreateTime(
+                    campaignUUID, stateFilter, startPaging, countPaging);
+        } else {
+            campaignParticipations = campaignParticipationRepository.findAllByCampaignUUIDWIthPagingSortedByCreateTime(
+                    campaignUUID, startPaging, countPaging);
+        }
+
+        List<ParticipationDTO> participationsForResp = new ArrayList<>();
+        campaignParticipations.forEach(participation -> {
+            ParticipationDTO participationForResp = ParticipationDTO.builder()
+                    .participationUUID(participation.getUuid())
+                    .campaignUUID(participation.getCampaignUUID())
+                    .participantUUID(participation.getParticipantUUID())
+                    .introduction(participation.getIntroduction())
+                    .evidenceURI(participation.getEvidenceURI()).build();
+            switch (participation.getState()) {
+            case CampaignStatus.PENDING:
+                participationForResp.setState("pending");
+                break;
+            case CampaignStatus.APPROVED:
+                participationForResp.setState("approved");
+                break;
+            case CampaignStatus.REJECTED:
+                participationForResp.setState("rejected");
+                break;
+            }
+            participationsForResp.add(participationForResp);
+        });
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to get participation informs of that campaign uuid");
+        resp.setParticipations(participationsForResp);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
