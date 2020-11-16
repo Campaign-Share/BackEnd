@@ -103,4 +103,11 @@ public class CampaignController {
                                                                                   @RequestHeader(value = "Authorization", required = false) String token) throws IOException {
         return campaignHandler.createNewParticipation(req, bindingResult, token);
     }
+
+    @GetMapping(path = "/campaigns/sorted-by/pending-participation")
+    public ResponseEntity<GetCampaignsSortedByParticipation.Response> getCampaignsSortedByParticipation(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                                                        @RequestParam(value = "start", required = false) Integer startPaging,
+                                                                                                        @RequestParam(value = "count", required = false) Integer countPaging) {
+        return campaignHandler.getCampaignsSortedByParticipation(token, startPaging, countPaging);
+    }
 }
