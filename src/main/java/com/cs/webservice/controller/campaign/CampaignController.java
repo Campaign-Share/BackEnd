@@ -133,12 +133,11 @@ public class CampaignController {
         return campaignHandler.takeActionInParticipation(token, participationUUID, action);
     }
 
-    @GetMapping(path = "/users/uuid/{user_uuid}/participations")
-    public ResponseEntity<GetParticipationsWithUserUUID.Response> getParticipationsWithUserUUID(@RequestHeader(value = "Authorization", required = false) String token,
+    @GetMapping(path = "/users/uuid/{user_uuid}/participate-campaigns")
+    public ResponseEntity<GetParticipateCampaigns.Response> getParticipateCampaigns(@RequestHeader(value = "Authorization", required = false) String token,
                                                                                       @PathVariable("user_uuid") String userUUID,
                                                                                       @RequestParam(value = "start", required = false) Integer startPaging,
-                                                                                      @RequestParam(value = "count", required = false) Integer countPaging,
-                                                                                      @RequestParam(value = "state", required = false) String stateFilter) {
-        return campaignHandler.getParticipationsWithUserUUID(token, userUUID, startPaging, countPaging, stateFilter);
+                                                                                      @RequestParam(value = "count", required = false) Integer countPaging) {
+        return campaignHandler.getParticipateCampaigns(token, userUUID, startPaging, countPaging);
     }
 }
