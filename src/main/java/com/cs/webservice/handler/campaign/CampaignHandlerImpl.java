@@ -1151,4 +1151,71 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
+
+    public ResponseEntity<TakeActionInParticipation.Response> takeActionInParticipation(String token, String participationUUID, String action) {
+        var resp = new TakeActionInParticipation.Response();
+
+        BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
+        if (!authenticateResult.authorized) {
+            resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+            resp.setCode(authenticateResult.code);
+            resp.setMessage(authenticateResult.message);
+            return new ResponseEntity<>(resp, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!authenticateResult.uuid.matches("^admin-\\d{12}")) {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            resp.setMessage("this API is only for admin");
+            return new ResponseEntity<>(resp, HttpStatus.FORBIDDEN);
+        }
+
+        Optional<CampaignParticipation> selectParticipation = campaignParticipationRepository.findById(participationUUID);
+        if (selectParticipation.isEmpty()) {
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage("campaign participations with that uuid is not exist");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+        CampaignParticipation campaignParticipation = selectParticipation.get();
+
+        // (수락 및 거절 시) -1111 -> 이미 수락 또는 거절 된 캠페인 인증임
+
+        switch (action) {
+        case "approve":
+            if (campaignParticipation.getState() != CampaignStatus.PENDING) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1111);
+                resp.setMessage("that participation is already approved or rejected");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaignParticipation.setState(CampaignStatus.APPROVED);
+            campaignParticipationRepository.save(campaignParticipation);
+            campaignRepository.findByUuid(campaignParticipation.getCampaignUUID()).ifPresent(campaign -> {
+                campaign.setParticipationNumber(campaign.getParticipationNumber() + 1);
+                campaignRepository.save(campaign);
+            });
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaignParticipation.getParticipantUUID()).build()).ifPresent(userInform -> {
+                userInform.setParticipationNumber(userInform.getParticipationNumber() + 1);
+                userInformRepository.save(userInform);
+            });
+            break;
+        case "reject":
+            if (campaignParticipation.getState() != CampaignStatus.PENDING) {
+                resp.setStatus(HttpStatus.CONFLICT.value());
+                resp.setCode(-1111);
+                resp.setMessage("that participation is already approved or rejected");
+                return new ResponseEntity<>(resp, HttpStatus.CONFLICT);
+            }
+            campaignParticipation.setState(CampaignStatus.REJECTED);
+            campaignParticipationRepository.save(campaignParticipation);
+            break;
+        default:
+            resp.setStatus(HttpStatus.NOT_FOUND.value());
+            resp.setMessage(action + " is undefined action");
+            return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
+        }
+
+        resp.setStatus(HttpStatus.OK.value());
+        resp.setMessage("succeed to take action to that campaign participation");
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
 }
