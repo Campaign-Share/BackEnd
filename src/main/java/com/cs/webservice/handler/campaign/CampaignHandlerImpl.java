@@ -917,9 +917,6 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             return new ResponseEntity<>(resp, HttpStatus.NOT_FOUND);
         }
 
-        // -1101 -> 수락된 캠페인이 아님
-        // -1102 -> 이미 참여 인증을 신청한 캠페인임
-
         Campaign campaign = selectCampaign.get();
         if (campaign.getStatus() != CampaignStatus.APPROVED) {
             resp.setStatus(HttpStatus.CONFLICT.value());
@@ -982,7 +979,14 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
 
         List<CampaignDTO> campaignsForResp = new ArrayList<>();
         List<String> campaignUUID = campaignParticipationRepository.findAllWithPagingSortedByTotalPendingNumber(startPaging, countPaging);
-        campaignRepository.findAllByUUIDSortedByUUID(campaignUUID).forEach(campaign -> {
+        if (campaignUUID.size() == 0) {
+            resp.setStatus(HttpStatus.OK.value());
+            resp.setMessage("succeed to get campaigns sorted by total pending participation number");
+            resp.setCampaigns(campaignsForResp);
+            return new ResponseEntity<>(resp, HttpStatus.OK);
+        }
+
+        campaignRepository.findAllByUUIDAndEndDateGreaterThanNowSortedByUUID(campaignUUID).forEach(campaign -> {
             CampaignDTO respCampaigns = CampaignDTO.builder()
                     .campaignUUID(campaign.getUuid())
                     .userUUID(campaign.getUserUUID())
@@ -1220,10 +1224,8 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
     }
 
 
-    public ResponseEntity<GetParticipationsWithUserUUID.Response> getParticipationsWithUserUUID(String token, String userUUID,
-                                                                                                Integer startPaging, Integer countPaging,
-                                                                                                String stateStrFilter) {
-        var resp = new GetParticipationsWithUserUUID.Response();
+    public ResponseEntity<GetParticipateCampaigns.Response> getParticipateCampaigns(String token, String userUUID, Integer startPaging, Integer countPaging) {
+        var resp = new GetParticipateCampaigns.Response();
 
         BaseHandler.AuthenticateResult authenticateResult = checkIfAuthenticated(token, jwtTokenProvider);
         if (!authenticateResult.authorized) {
@@ -1246,55 +1248,54 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             countPaging = 10;
         }
 
-        Integer stateFilter = null;
-        if (stateStrFilter != null) {
-            switch (stateStrFilter) {
-                case "pending":
-                    stateFilter = CampaignStatus.PENDING;
-                    break;
-                case "approved":
-                    stateFilter = CampaignStatus.APPROVED;
-                    break;
-                case "rejected":
-                    stateFilter = CampaignStatus.REJECTED;
-                    break;
-            }
+        List<String> campaignUUIDs = campaignParticipationRepository.
+                        findCampaignUUIDByUserUUIDWithPagingSortedByUpdateTime(userUUID, startPaging, countPaging);
+        List<CampaignDTO> campaignsForResp = new ArrayList<>();
+
+        if (campaignUUIDs.size() == 0) {
+            resp.setStatus(HttpStatus.OK.value());
+            resp.setMessage("succeed to get participate campaigns informs with user uuid");
+            resp.setCampaigns(campaignsForResp);
+            return new ResponseEntity<>(resp, HttpStatus.OK);
         }
 
-        List<CampaignParticipation> campaignParticipations;
-        if (stateFilter != null) {
-            campaignParticipations = campaignParticipationRepository.findAllByUserUUIDAndStateWIthPagingSortedByCreateTime(
-                    userUUID, stateFilter, startPaging, countPaging);
-        } else {
-            campaignParticipations = campaignParticipationRepository.findAllByUserUUIDWIthPagingSortedByCreateTime(
-                    userUUID, startPaging, countPaging);
-        }
-
-        List<ParticipationDTO> participationsForResp = new ArrayList<>();
-        campaignParticipations.forEach(campaignParticipation -> {
-            ParticipationDTO participationForResp = ParticipationDTO.builder()
-                    .participationUUID(campaignParticipation.getUuid())
-                    .campaignUUID(campaignParticipation.getCampaignUUID())
-                    .participantUUID(campaignParticipation.getParticipantUUID())
-                    .introduction(campaignParticipation.getIntroduction())
-                    .evidenceURI(campaignParticipation.getEvidenceURI()).build();
-            switch (campaignParticipation.getState()) {
-            case CampaignStatus.PENDING:
-                participationForResp.setState("pending");
-                break;
-            case CampaignStatus.APPROVED:
-                participationForResp.setState("approved");
-                break;
-            case CampaignStatus.REJECTED:
-                participationForResp.setState("rejected");
-                break;
+        campaignRepository.findAllByUUIDSortedByUUID(campaignUUIDs).forEach(campaign -> {
+            CampaignDTO respCampaigns = CampaignDTO.builder()
+                    .campaignUUID(campaign.getUuid())
+                    .userUUID(campaign.getUserUUID())
+                    .title(campaign.getTitle())
+                    .subTitle(campaign.getSubTitle())
+                    .introduction(campaign.getIntroduction())
+                    .participation(campaign.getParticipation())
+                    .startDate(campaign.getStartDate())
+                    .endDate(campaign.getEndDate())
+                    .postURI(campaign.getPostURI())
+                    .agreeNumber(campaign.getAgreeNumber())
+                    .disAgreeNumber(campaign.getDisagreeNumber())
+                    .participationNumber(campaign.getParticipationNumber()).build();
+            switch (campaign.getStatus()) {
+                case CampaignStatus.PENDING:
+                    respCampaigns.setState("pending");
+                    break;
+                case CampaignStatus.APPROVED:
+                    respCampaigns.setState("approved");
+                    break;
+                case CampaignStatus.REJECTED:
+                    respCampaigns.setState("rejected");
+                    break;
             }
-            participationsForResp.add(participationForResp);
+
+            List<String> respCampaignTags = new ArrayList<>();
+            campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
+                    .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
+
+            respCampaigns.setCampaignTags(respCampaignTags);
+            campaignsForResp.add(respCampaigns);
         });
 
         resp.setStatus(HttpStatus.OK.value());
-        resp.setMessage("succeed to get participation informs with user uuid");
-        resp.setParticipations(participationsForResp);
+        resp.setMessage("succeed to get participate campaigns informs with user uuid");
+        resp.setCampaigns(campaignsForResp);
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 }
