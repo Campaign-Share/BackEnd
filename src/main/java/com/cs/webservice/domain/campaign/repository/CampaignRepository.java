@@ -57,6 +57,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, String> {
     @Query(value = "SELECT * FROM campaigns WHERE uuid IN (?1) AND status=1 ORDER BY FIELD(uuid, ?1)", nativeQuery = true)
     List<Campaign> findAllByUUIDSortedByUUID(List<String> campaignUUIDs);
 
+    @Query(value = "SELECT * FROM campaigns WHERE uuid IN (?1) AND status=1 AND CURRENT_DATE() <= CAST(end_date AS DATETIME) ORDER BY FIELD(uuid, ?1)", nativeQuery = true)
+    List<Campaign> findAllByUUIDAndEndDateGreaterThanNowSortedByUUID(List<String> campaignUUIDs);
+
     default String getAvailableUUID() {
         while (true) {
             String campaignUUID = "campaign-" + Random.generateNumberString(12);
