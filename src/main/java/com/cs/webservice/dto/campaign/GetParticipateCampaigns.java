@@ -7,11 +7,11 @@ import lombok.Setter;
 
 import java.util.List;
 
-public class GetParticipationsWithUserUUID {
+public class GetParticipateCampaigns {
     @Setter
     @NoArgsConstructor
     public static class Response extends BaseResponse {
-        @JsonProperty("participations")
-        List<ParticipationDTO> participations;
+        @JsonProperty("campaigns")
+        List<CampaignDTO> campaigns;
     }
 }
