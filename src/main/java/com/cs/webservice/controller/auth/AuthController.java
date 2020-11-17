@@ -57,7 +57,7 @@ public class AuthController {
         return authHandler.loginAdminAuth(req, bindingResult);
     }
 
-    @GetMapping(path = "/users", consumes = {"application/json"})
+    @PostMapping(path = "/users/with-uuids", consumes = {"application/json"})
     public ResponseEntity<GetUserInformsWithUUIDs.Response> getUserInformsWithUUIDs(@Valid @RequestBody GetUserInformsWithUUIDs.Request req, BindingResult bindingResult,
                                                                                 @RequestHeader(value = "Authorization", required = false) String token) {
         return authHandler.getUserInformsWithUUIDs(req, bindingResult, token);
