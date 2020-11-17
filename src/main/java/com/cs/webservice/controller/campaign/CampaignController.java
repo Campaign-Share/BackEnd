@@ -64,7 +64,7 @@ public class CampaignController {
         return campaignHandler.getCampaignWithUUID(token, campaignUUID);
     }
 
-    @GetMapping(path = "/campaigns", consumes = {"application/json"})
+    @PostMapping(path = "/campaigns/with-uuids", consumes = {"application/json"})
     public ResponseEntity<GetCampaignsWithUUIDs.Response> getCampaignsWithUUIDs(@Valid @RequestBody GetCampaignsWithUUIDs.Request req, BindingResult bindingResult,
                                                                                 @RequestHeader(value = "Authorization", required = false) String token) {
         return campaignHandler.getCampaignsWithUUIDs(req, bindingResult, token);
@@ -120,9 +120,16 @@ public class CampaignController {
         return campaignHandler.getParticipationsSortedByCreate(token, campaignUUID, startPaging, countPaging, stateFilter);
     }
 
-    @GetMapping(path = "participations/uuid/{participation_uuid}")
+    @GetMapping(path = "/participations/uuid/{participation_uuid}")
     public ResponseEntity<GetParticipationWithUUID.Response> getParticipationWithUUID(@RequestHeader(value = "Authorization", required = false) String token,
                                                                                       @PathVariable("participation_uuid") String participationUUID) {
         return campaignHandler.getParticipationWithUUID(token, participationUUID);
+    }
+
+    @PostMapping(path = "/participations/uuid/{participation_uuid}/actions/{action}")
+    public ResponseEntity<TakeActionInParticipation.Response> takeActionInParticipation(@RequestHeader(value = "Authorization", required = false) String token,
+                                                                          @PathVariable("participation_uuid") String participationUUID,
+                                                                          @PathVariable("action") String action) {
+        return campaignHandler.takeActionInParticipation(token, participationUUID, action);
     }
 }
