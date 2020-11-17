@@ -28,6 +28,5 @@ public interface CampaignHandler {
                                                                                        Integer startPaging, Integer countPaging, String stateFilter);
     ResponseEntity<GetParticipationWithUUID.Response> getParticipationWithUUID(String token, String participationUUID);
     ResponseEntity<TakeActionInParticipation.Response> takeActionInParticipation(String token, String participationUUID, String action);
-    ResponseEntity<GetParticipationsWithUserUUID.Response> getParticipationsWithUserUUID(String token, String userUUID,
-                                                                                         Integer startPaging, Integer countPaging, String stateFilter);
+    ResponseEntity<GetParticipateCampaigns.Response> getParticipateCampaigns(String token, String userUUID, Integer startPaging, Integer countPaging);
 }
