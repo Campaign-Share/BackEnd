@@ -22,6 +22,13 @@ public interface CampaignParticipationRepository extends JpaRepository<CampaignP
     List<CampaignParticipation> findAllByCampaignUUIDAndStateWIthPagingSortedByCreateTime(String campaignUUID, Integer state,
                                                                                           Integer start, Integer count);
 
+    @Query(value = "SELECT * FROM campaign_participations WHERE participant_uuid=?1 LIMIT ?3 OFFSET ?2", nativeQuery = true)
+    List<CampaignParticipation> findAllByUserUUIDWIthPagingSortedByCreateTime(String participantUUID, Integer start, Integer count);
+
+    @Query(value = "SELECT * FROM campaign_participations WHERE participant_uuid=?1 AND state=?2 LIMIT ?4 OFFSET ?3", nativeQuery = true)
+    List<CampaignParticipation> findAllByUserUUIDAndStateWIthPagingSortedByCreateTime(String participantUUID, Integer state,
+                                                                                          Integer start, Integer count);
+
     default String getAvailableUUID() {
         while (true) {
             String participationUUID = "participation-" + Random.generateNumberString(12);
