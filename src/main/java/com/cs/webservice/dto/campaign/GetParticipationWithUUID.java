@@ -10,21 +10,27 @@ public class GetParticipationWithUUID {
     @NoArgsConstructor
     public static class Response extends BaseResponse {
         @JsonProperty("participation_uuid")
-        String participationUUID;
+        private String participationUUID;
 
         @JsonProperty("participant_uuid")
-        String participantUUID;
+        private String participantUUID;
 
         @JsonProperty("campaign_uuid")
-        String campaignUUID;
+        private String campaignUUID;
 
         @JsonProperty("introduction")
-        String introduction;
+        private String introduction;
 
         @JsonProperty("state")
-        String state;
+        private String state;
 
         @JsonProperty("evidence_uri")
-        String evidenceURI;
+        private String evidenceURI;
+
+        @JsonProperty("user_name")
+        private String userName;
+
+        @JsonProperty("campaign_title")
+        private String campaignTitle;
     }
 }
