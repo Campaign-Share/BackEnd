@@ -24,4 +24,10 @@ public class CampaignReportDTO {
 
     @JsonProperty("state")
     private String state;
+
+    @JsonProperty("user_name")
+    private String userName;
+
+    @JsonProperty("campaign_title")
+    private String campaignTitle;
 }
