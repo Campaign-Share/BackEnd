@@ -804,6 +804,9 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
             } else {
                 reportForResp.setState("pending");
             }
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(report.getReporterUUID()).build()).ifPresent(userInform ->
+                    reportForResp.setUserName(userInform.getName()));
+            campaignRepository.findByUuid(report.getTargetUUID()).ifPresent(campaign -> reportForResp.setCampaignTitle(campaign.getTitle()));
             reportsForResp.add(reportForResp);
         });
 
