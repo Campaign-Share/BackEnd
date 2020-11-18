@@ -1103,6 +1103,9 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                 participationForResp.setState("rejected");
                 break;
             }
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(participation.getParticipantUUID()).build()).ifPresent(userInform ->
+                    participationForResp.setUserName(userInform.getName()));
+            campaignRepository.findByUuid(participation.getCampaignUUID()).ifPresent(campaign -> participationForResp.setCampaignTitle(campaign.getTitle()));
             participationsForResp.add(participationForResp);
         });
 
@@ -1155,6 +1158,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                 resp.setState("rejected");
                 break;
         }
+        userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaignParticipation.getParticipantUUID()).build()).ifPresent(userInform ->
+                resp.setUserName(userInform.getName()));
+        campaignRepository.findByUuid(campaignParticipation.getCampaignUUID()).ifPresent(campaign ->
+                resp.setCampaignTitle(campaign.getTitle()));
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
