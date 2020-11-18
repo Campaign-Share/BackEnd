@@ -77,7 +77,7 @@ public class CampaignController {
         return campaignHandler.takeActionInCampaign(token, campaignUUID, action);
     }
 
-    @PostMapping(path = "/report")
+    @PostMapping(path = "/reports")
     public ResponseEntity<ReportCampaign.Response> reportCampaign(@Valid @RequestBody ReportCampaign.Request req, BindingResult bindingResult,
                                                                   @RequestHeader(value = "Authorization", required = false) String token) {
         return campaignHandler.reportCampaign(req, bindingResult, token);
