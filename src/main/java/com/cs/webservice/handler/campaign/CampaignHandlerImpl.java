@@ -192,6 +192,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     break;
             }
 
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
+
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
                     .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
@@ -278,6 +282,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                 respCampaigns.setState("rejected");
                 break;
             }
+
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
 
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
@@ -366,6 +374,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     break;
             }
 
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
+
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
                     .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
@@ -452,6 +464,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     respCampaigns.setState("rejected");
                     break;
             }
+
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
 
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
@@ -565,6 +581,9 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     respCampaigns.setState("rejected");
                     break;
             }
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
                     .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
@@ -1015,6 +1034,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     break;
             }
 
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
+
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
                     .forEach(campaignTag -> respCampaignTags.add(campaignTag.getTag()));
@@ -1294,6 +1317,10 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
                     respCampaigns.setState("rejected");
                     break;
             }
+
+            userInformRepository.findByUserAuth(UserAuth.builder().uuid(campaign.getUserUUID()).build()).ifPresent(
+                    userInform -> respCampaigns.setNickName(userInform.getNickName())
+            );
 
             List<String> respCampaignTags = new ArrayList<>();
             campaignTagRepository.findAllByCampaignUUID(campaign.getUuid())
