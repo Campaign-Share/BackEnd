@@ -945,7 +945,7 @@ public class CampaignHandlerImpl extends BaseHandler implements CampaignHandler 
         if (req.getEvidence() != null) {
             String evidenceURI = "campaign/evidences/" + participationUUID;
             campaignParticipation.setEvidenceURI(evidenceURI);
-            s3Service.upload(req.getEvidence(), evidenceURI);
+            s3Service.uploadWithContentType(req.getEvidence(), evidenceURI, "image/jpeg");
         }
 
         campaignParticipationRepository.save(campaignParticipation);
