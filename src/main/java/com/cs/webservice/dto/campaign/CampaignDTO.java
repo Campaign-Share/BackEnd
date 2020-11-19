@@ -51,4 +51,7 @@ public final class CampaignDTO {
 
     @JsonProperty("participation_number")
     private int participationNumber;
+
+    @JsonProperty("nick_name")
+    private String nickName;
 }
