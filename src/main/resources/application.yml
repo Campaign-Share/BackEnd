@@ -1,0 +1,38 @@
+server:
+  port: 80
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_ADDRESS:localhost}:3306/CampaignShareDB?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul&createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL55Dialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: richimous0719@gmail.com
+    password: ${GMAIL_PASSWORD:none}
+    protocol: smtp
+
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET_KEY:a1b2c3d4!@#$a1b2c3d4!@#$a1b2c3d4!@#$}
+      expire-length: ${JWT_EXPIRE_AT:86400}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${CAMPAIGN_SHARE_AWS_ID}
+      secretKey: ${CAMPAIGN_SHARE_AWS_SECRET}
+    s3:
+      bucket: campaignshare
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
